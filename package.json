@@ -1,0 +1,19 @@
+{
+  "name": "gramunnat",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@netlify/database": "latest",
+    "@netlify/functions": "latest",
+    "drizzle-orm": "beta",
+    "openai": "latest"
+  },
+  "devDependencies": {
+    "drizzle-kit": "beta",
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "0bda854c-2b92-4a39-925d-5a785936c5d7",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "ddl": [
+    {
+      "isRlsEnabled": false,
+      "name": "app_states",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_key",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "app_states"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "name": "data",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "app_states"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "app_states"
+    },
+    {
+      "columns": [
+        "user_key"
+      ],
+      "nameExplicit": false,
+      "name": "app_states_pkey",
+      "schema": "public",
+      "table": "app_states",
+      "entityType": "pks"
+    }
+  ],
+  "renames": []
+}

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GramUnnat — Digital Farm Companion</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --soil:#4a3222;
+  --leaf:#2f4a2c;
+  --leaf-dark:#203420;
+  --wheat:#d9a441;
+  --wheat-dark:#b8842c;
+  --sky:#4a7fa5;
+  --bg:#f6f1e6;
+  --card:#fffdf8;
+  --ink:#2b2417;
+  --ink-soft:#5c5240;
+  --line:#e3d9c2;
+  --danger:#a5452f;
+  --ok:#3f6b3a;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(43,36,23,0.06);
+}
+*{box-sizing:border-box;}
+body{margin:0;}
+body, input, select, textarea, button{font-family:'Work Sans', sans-serif; color:var(--ink);}
+h1,h2,h3,.display{font-family:'Fraunces', serif;}
+.mono{font-family:'JetBrains Mono', monospace;}
+body{background:var(--bg);}
+:focus-visible{outline:3px solid var(--wheat-dark); outline-offset:2px;}
+
+/* ---------- Auth screen ---------- */
+#authScreen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  background:radial-gradient(circle at 20% 15%, #3a5636 0%, var(--leaf-dark) 55%, #182818 100%);
+}
+.auth-shell{width:100%; max-width:920px; display:grid; grid-template-columns:1.05fr 1fr; background:var(--card); border-radius:20px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.35);}
+.auth-side{
+  background:linear-gradient(160deg, var(--leaf) 0%, var(--leaf-dark) 100%); color:#f6f1e6; padding:36px 30px;
+  display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;
+}
+.auth-side::after{content:""; position:absolute; right:-60px; bottom:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(217,164,65,0.25), transparent 70%);}
+.auth-side .mark{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg, var(--wheat), var(--wheat-dark)); display:flex;align-items:center;justify-content:center;font-size:24px; margin-bottom:16px;}
+.auth-side h1{font-size:26px; margin:0 0 10px; font-weight:600; line-height:1.2;}
+.auth-side p{font-size:14px; color:#d7ddc9; line-height:1.6; margin:0;}
+.auth-side ul{list-style:none; padding:0; margin:22px 0 0; display:flex; flex-direction:column; gap:12px; position:relative; z-index:1;}
+.auth-side li{font-size:13.5px; color:#e7ecdd; display:flex; align-items:center; gap:10px;}
+.auth-side li .ico{width:26px;height:26px;border-radius:7px;background:rgba(217,164,65,0.22); display:flex;align-items:center;justify-content:center; font-size:14px; flex-shrink:0;}
+.auth-form-wrap{padding:34px 32px;}
+.auth-tabs{display:flex; gap:6px; background:#f1ece0; border-radius:11px; padding:4px; margin-bottom:22px;}
+.auth-tab{flex:1; text-align:center; padding:9px; border-radius:8px; border:none; background:transparent; font-weight:700; font-size:13.5px; cursor:pointer; color:var(--ink-soft);}
+.auth-tab.active{background:var(--card); color:var(--leaf-dark); box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.auth-form{display:none;}
+.auth-form.active{display:block;}
+.auth-error{color:var(--danger); font-size:12.5px; min-height:16px; margin:-6px 0 10px;}
+.auth-divider{display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--ink-soft); font-size:12px;}
+.auth-divider::before, .auth-divider::after{content:""; flex:1; height:1px; background:var(--line);}
+.demo-login-btn{width:100%; justify-content:center;}
+.auth-note{font-size:11.5px; color:var(--ink-soft); margin-top:16px; line-height:1.5;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--leaf-dark);
+  color:#f6f1e6;
+  padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  flex-wrap:wrap;
+  position:sticky; top:0; z-index:50;
+  border-bottom:3px solid var(--wheat);
+}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand .mark{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg, var(--wheat), var(--wheat-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif; font-weight:700; color:var(--leaf-dark); font-size:18px;
+}
+.brand .name{font-family:'Fraunces',serif; font-weight:600; font-size:19px; letter-spacing:0.2px;}
+.brand .tag{font-size:11px; color:#c9c2ab; letter-spacing:0.4px; text-transform:uppercase;}
+.topbar-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+select#langSelect{
+  background:#25381f; color:#f6f1e6; border:1px solid #46583d; border-radius:8px;
+  padding:7px 10px; font-size:13px; cursor:pointer;
+}
+.conn-pill{
+  font-size:12px; padding:5px 10px; border-radius:20px; background:#25381f; border:1px solid #46583d;
+  display:flex; align-items:center; gap:6px;
+}
+.conn-dot{width:7px;height:7px;border-radius:50%; background:#7fbf6b;}
+.user-pill{font-size:12.5px; padding:5px 10px; border-radius:20px; background:#25381f; border:1px solid #46583d; display:flex; align-items:center; gap:6px;}
+.logout-btn{background:transparent; border:1px solid #46583d; color:#f6f1e6; padding:6px 11px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer;}
+.logout-btn:hover{background:#3a5636;}
+
+/* ---------- Nav tabs ---------- */
+.tabs{
+  display:flex; gap:4px; padding:10px 16px; background:var(--leaf);
+  overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex:0 0 auto;
+  background:transparent; border:none; color:#dfe8d9; padding:9px 14px;
+  border-radius:9px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+  display:flex; align-items:center; gap:7px;
+  transition:background 0.15s;
+}
+.tab-btn:hover{background:#3a5636;}
+.tab-btn.active{background:var(--wheat); color:var(--leaf-dark);}
+
+main{max-width:1080px; margin:0 auto; padding:22px 16px 60px;}
+.panel{display:none; animation:fade 0.25s ease;}
+.panel.active{display:block;}
+@keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+.hero{
+  background:linear-gradient(120deg, var(--leaf) 0%, var(--leaf-dark) 100%);
+  color:#f6f1e6; border-radius:18px; padding:28px 26px; margin-bottom:22px;
+  position:relative; overflow:hidden;
+}
+.hero::after{
+  content:""; position:absolute; right:-40px; top:-40px; width:180px; height:180px; border-radius:50%;
+  background:radial-gradient(circle, rgba(217,164,65,0.25), transparent 70%);
+}
+.hero h1{font-size:26px; margin:0 0 6px; font-weight:600;}
+.hero p{margin:0; color:#d7ddc9; font-size:14.5px; max-width:640px; line-height:1.5;}
+.hero-stats{display:flex; gap:22px; margin-top:18px; flex-wrap:wrap;}
+.hero-stat .num{font-family:'Fraunces',serif; font-size:22px; color:var(--wheat); font-weight:600;}
+.hero-stat .lbl{font-size:11.5px; color:#b9c2a8; text-transform:uppercase; letter-spacing:0.5px;}
+
+.location-strip{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;
+  margin-bottom:18px; box-shadow:var(--shadow);
+}
+.location-strip h3{margin:0 0 4px; font-size:15px; display:flex; align-items:center; gap:7px;}
+.location-strip p{margin:0; font-size:13px; color:var(--ink-soft);}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:18px; box-shadow:var(--shadow);
+}
+.card h3{margin:0 0 8px; font-size:16px; display:flex; align-items:center; gap:8px;}
+.card p{margin:0; font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+.nav-card{cursor:pointer; transition:transform 0.15s, border-color 0.15s;}
+.nav-card:hover{transform:translateY(-2px); border-color:var(--wheat-dark);}
+.icon-circle{
+  width:38px;height:38px;border-radius:10px; display:flex; align-items:center;justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.section-title{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
+.section-title h2{font-size:20px; margin:0; font-weight:600;}
+.section-sub{color:var(--ink-soft); font-size:13.5px; margin-top:2px;}
+
+.btn{
+  background:var(--leaf); color:#fff; border:none; padding:10px 16px; border-radius:9px;
+  font-weight:600; font-size:13.5px; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+  transition:background 0.15s;
+}
+.btn:hover{background:var(--leaf-dark);}
+.btn.gold{background:var(--wheat); color:var(--leaf-dark);}
+.btn.gold:hover{background:var(--wheat-dark); color:#fff;}
+.btn.outline{background:transparent; border:1.5px solid var(--line); color:var(--ink);}
+.btn.outline:hover{border-color:var(--leaf);}
+.btn:disabled{opacity:0.5; cursor:not-allowed;}
+.btn.small{padding:6px 11px; font-size:12.5px;}
+.btn.danger{background:var(--danger);}
+.btn.full{width:100%; justify-content:center;}
+
+label{font-size:12.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.3px;}
+input[type=text], input[type=number], input[type=date], input[type=password], input[type=tel], select, textarea{
+  width:100%; padding:10px 11px; border:1.5px solid var(--line); border-radius:9px; font-size:14px;
+  background:#fff;
+}
+input:focus, select:focus, textarea:focus{border-color:var(--leaf);}
+.field{margin-bottom:14px;}
+.row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px;}
+
+.badge{display:inline-block; padding:3px 9px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.2px;}
+.badge.ok{background:#e3ede0; color:var(--ok);}
+.badge.warn{background:#fbe9d6; color:#9a5b1c;}
+.badge.bad{background:#f6dfd8; color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th{text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--ink-soft); padding:8px 10px; border-bottom:2px solid var(--line);}
+td{padding:10px; border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none;}
+.empty-state{text-align:center; padding:36px 16px; color:var(--ink-soft);}
+.empty-state .glyph{font-size:34px; margin-bottom:8px;}
+
+/* Disease detection */
+.upload-zone{
+  border:2px dashed var(--line); border-radius:14px; padding:34px 20px; text-align:center;
+  background:#fbf8f1; cursor:pointer; transition:border-color 0.15s;
+}
+.upload-zone:hover{border-color:var(--wheat-dark);}
+.upload-zone.has-image{padding:14px;}
+#previewImg{max-width:100%; max-height:260px; border-radius:10px; display:none;}
+.analysis-result{margin-top:16px; border-top:1px solid var(--line); padding-top:16px; display:none;}
+.confidence-bar{height:8px; border-radius:20px; background:var(--line); overflow:hidden; margin-top:6px;}
+.confidence-fill{height:100%; background:linear-gradient(90deg, var(--wheat-dark), var(--wheat));}
+.demo-tag{
+  display:inline-flex; align-items:center; gap:5px; background:#fbe9d6; color:#9a5b1c;
+  font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; margin-bottom:10px;
+}
+
+/* Chatbot */
+.chat-wrap{background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow);}
+.chat-log{height:380px; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px;}
+.msg{max-width:78%; padding:10px 14px; border-radius:14px; font-size:14px; line-height:1.5;}
+.msg.bot{background:#eef2ea; align-self:flex-start; border-bottom-left-radius:4px;}
+.msg.user{background:var(--leaf); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+.chat-input-row{display:flex; gap:8px; padding:14px; border-top:1px solid var(--line); background:#fbf8f1;}
+.chat-input-row input{flex:1;}
+.mic-btn{
+  width:42px; height:42px; border-radius:50%; border:none; background:var(--sky); color:#fff;
+  font-size:17px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+}
+.mic-btn.listening{background:var(--danger); animation:pulse 1s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(165,69,47,0.5);} 100%{box-shadow:0 0 0 12px rgba(165,69,47,0);}}
+
+/* Weather */
+.weather-hero{
+  background:linear-gradient(120deg, var(--sky), #2f5a78); color:#fff; border-radius:16px; padding:22px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+}
+.weather-temp{font-family:'Fraunces',serif; font-size:46px; font-weight:600;}
+.forecast-strip{display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px; margin-top:14px;}
+.fday{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 8px; text-align:center;}
+.fday .d{font-size:12px; font-weight:700; color:var(--ink-soft);}
+.fday .ic{font-size:22px; margin:6px 0;}
+.fday .t{font-size:13px; font-weight:600;}
+
+.toast{
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--leaf-dark); color:#fff;
+  padding:11px 18px; border-radius:10px; font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  opacity:0; pointer-events:none; transition:opacity 0.2s, transform 0.2s; z-index:200; max-width:90vw; text-align:center;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+.modal-bg{position:fixed; inset:0; background:rgba(30,25,15,0.45); display:none; align-items:center; justify-content:center; z-index:100; padding:16px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card); border-radius:16px; padding:22px; max-width:420px; width:100%; box-shadow:0 12px 40px rgba(0,0,0,0.2);}
+
+footer{text-align:center; padding:24px; color:var(--ink-soft); font-size:12.5px;}
+
+@media (max-width:820px){
+  .auth-shell{grid-template-columns:1fr;}
+  .auth-side{padding:26px 24px;}
+  .auth-side ul{display:none;}
+}
+@media (max-width:640px){
+  .hero h1{font-size:21px;}
+  .weather-temp{font-size:36px;}
+  .chat-log{height:320px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= AUTH SCREEN ================= -->
+<div id="authScreen">
+  <div class="auth-shell">
+    <div class="auth-side">
+      <div>
+        <div class="mark">🌾</div>
+        <h1 data-i18n="authSideTitle">GramUnnat — one login for your whole farm</h1>
+        <p data-i18n="authSideSub">Crop disease help, animal health alerts, your farm history, weather and expert advice — all saved to your account, in your language.</p>
+        <ul>
+          <li><span class="ico">🌿</span><span data-i18n="authFeat1">Instant crop disease guidance</span></li>
+          <li><span class="ico">🐄</span><span data-i18n="authFeat2">Livestock health alerts</span></li>
+          <li><span class="ico">📍</span><span data-i18n="authFeat3">Live weather for your exact location</span></li>
+          <li><span class="ico">💬</span><span data-i18n="authFeat4">Voice chatbot in Hindi & English</span></li>
+        </ul>
+      </div>
+      <p style="font-size:11.5px; color:#b9c2a8; position:relative; z-index:1;" data-i18n="authSideFooter">Your data is stored securely on this device.</p>
+    </div>
+    <div class="auth-form-wrap">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLoginBtn" data-i18n="loginTab">Log in</button>
+        <button class="auth-tab" id="tabSignupBtn" data-i18n="signupTab">Sign up</button>
+      </div>
+
+      <form class="auth-form active" id="loginForm">
+        <div class="field"><label data-i18n="fieldPhone">Phone number</label><input type="tel" id="liPhone" placeholder="98765 43210" required autocomplete="username"></div>
+        <div class="field"><label data-i18n="fieldPassword">Password</label><input type="password" id="liPass" placeholder="••••••••" required autocomplete="current-password"></div>
+        <div class="auth-error" id="loginError"></div>
+        <button type="submit" class="btn gold full" data-i18n="loginBtn">Log in</button>
+      </form>
+
+      <form class="auth-form" id="signupForm">
+        <div class="field"><label data-i18n="fieldName">Full name</label><input type="text" id="suName" placeholder="e.g. Ramesh Kumar" required></div>
+        <div class="row">
+          <div class="field"><label data-i18n="fieldPhone">Phone number</label><input type="tel" id="suPhone" placeholder="98765 43210" required></div>
+          <div class="field"><label data-i18n="fieldVillage">Village / District</label><input type="text" id="suVillage" placeholder="e.g. Rampur, MP"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label data-i18n="fieldPassword">Password</label><input type="password" id="suPass" placeholder="min 4 characters" required></div>
+          <div class="field"><label data-i18n="fieldConfirmPassword">Confirm password</label><input type="password" id="suPass2" placeholder="••••••••" required></div>
+        </div>
+        <div class="auth-error" id="signupError"></div>
+        <button type="submit" class="btn gold full" data-i18n="signupBtn">Create account</button>
+      </form>
+
+      <div class="auth-divider" data-i18n="orDemo">or</div>
+      <button class="btn outline full demo-login-btn" id="demoLoginBtn" data-i18n="demoBtn">👨‍🌾 Continue with demo farmer account</button>
+      <p class="auth-note" data-i18n="authNote">This login runs entirely in your browser for the prototype — no data leaves your device except live weather and location lookups.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ROOT ================= -->
+<div id="appRoot" style="display:none;">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">🌾</div>
+    <div>
+      <div class="name" data-i18n="brandName">GramUnnat</div>
+      <div class="tag" data-i18n="brandTag">Digital Crop & Livestock Companion</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="conn-pill"><span class="conn-dot"></span><span data-i18n="offlineReady">Offline-ready</span></span>
+    <span class="user-pill">👤 <span id="userNameDisplay"></span></span>
+    <button class="logout-btn" id="logoutBtn" data-i18n="logoutBtn">Log out</button>
+    <select id="langSelect" aria-label="Select language"></select>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar" role="tablist"></div>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section class="panel active" id="panel-dashboard">
+    <div class="hero">
+      <h1 data-i18n="heroTitle">Namaste 🙏 — everything your farm needs, in one place</h1>
+      <p data-i18n="heroSub">Crop disease detection, livestock health monitoring, your farm's full history, and expert advisory — built for low bandwidth, spoken in your language.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num" id="statRecords">0</div><div class="lbl" data-i18n="statRecords">Farm Records</div></div>
+        <div class="hero-stat"><div class="num" id="statLivestock">0</div><div class="lbl" data-i18n="statLivestock">Animals Tracked</div></div>
+        <div class="hero-stat"><div class="num" id="statScans">0</div><div class="lbl" data-i18n="statScans">Crop Scans</div></div>
+      </div>
+    </div>
+
+    <div class="location-strip">
+      <div>
+        <h3>📍 <span data-i18n="yourLocation">Your location</span></h3>
+        <p id="locationStatusText" data-i18n="locationPrompt">Tap detect to see your local weather at a glance.</p>
+      </div>
+      <button class="btn gold small" id="detectLocBtn" data-i18n="detectLoc">Detect my location</button>
+    </div>
+
+    <div class="section-title"><h2 data-i18n="quickAccess">Quick access</h2></div>
+    <div class="grid">
+      <div class="card nav-card" data-goto="disease">
+        <div class="icon-circle" style="background:#e3ede0;">🌿</div>
+        <h3 data-i18n="navDisease">Crop Disease ID</h3>
+        <p data-i18n="navDiseaseDesc">Upload a leaf photo for instant AI-assisted diagnosis and treatment advice.</p>
+      </div>
+      <div class="card nav-card" data-goto="livestock">
+        <div class="icon-circle" style="background:#fbe9d6;">🐄</div>
+        <h3 data-i18n="navLivestock">Livestock Monitoring</h3>
+        <p data-i18n="navLivestockDesc">Track animal health, vaccinations, and get early warning alerts.</p>
+      </div>
+      <div class="card nav-card" data-goto="records">
+        <div class="icon-circle" style="background:#e6e2f5;">📋</div>
+        <h3 data-i18n="navRecords">Farm Records</h3>
+        <p data-i18n="navRecordsDesc">Your full history of crops, yields, and treatments — always available.</p>
+      </div>
+      <div class="card nav-card" data-goto="advisory">
+        <div class="icon-circle" style="background:#fdeccb;">💡</div>
+        <h3 data-i18n="navAdvisory">Advisory Services</h3>
+        <p data-i18n="navAdvisoryDesc">Actionable, season-aware tips tailored to your crop and region.</p>
+      </div>
+      <div class="card nav-card" data-goto="weather">
+        <div class="icon-circle" style="background:#dcedf5;">⛅</div>
+        <h3 data-i18n="navWeather">Weather Forecast</h3>
+        <p data-i18n="navWeatherDesc">Live, location-based forecast with farming-specific alerts.</p>
+      </div>
+      <div class="card nav-card" data-goto="chatbot">
+        <div class="icon-circle" style="background:#f5dce6;">💬</div>
+        <h3 data-i18n="navChat">Ayush</h3>
+        <p data-i18n="navChatDesc">Voice or text chatbot that speaks your language.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CROP DISEASE -->
+  <section class="panel" id="panel-disease">
+    <div class="section-title">
+      <div><h2 data-i18n="diseaseTitle">Crop Disease Identification</h2>
+      <div class="section-sub" data-i18n="diseaseSub">Upload or capture a photo of the affected leaf/plant.</div></div>
+    </div>
+    <div class="card">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
+        <img id="previewImg" alt="Uploaded crop photo preview">
+        <div id="uploadPrompt">
+          <div style="font-size:34px;">📷</div>
+          <p style="margin:10px 0 4px; font-weight:600;" data-i18n="uploadPrompt1">Tap to upload or capture a photo</p>
+          <p style="color:var(--ink-soft); font-size:13px;" data-i18n="uploadPrompt2">JPG or PNG · works with basic phone cameras</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+        <button class="btn gold" id="analyzeBtn" disabled data-i18n="analyzeBtn">🔍 Diagnose</button>
+        <button class="btn outline" id="resetUploadBtn" data-i18n="resetBtn">Reset</button>
+      </div>
+
+      <div class="analysis-result" id="analysisResult">
+        <span class="demo-tag">AI-assisted result · confirm serious cases with a local expert</span>
+        <div id="resultBody"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px; background:#fbf8f1;">
+      <h3 style="font-size:14px;" data-i18n="howItWorksTitle">🔧 Responsible image diagnosis</h3>
+      <p data-i18n="howItWorksDesc">GramUnnat securely sends the selected image to a server-side vision model. Results are possible matches, not guaranteed diagnoses. Confirm severe, unusual, or fast-spreading symptoms with a local agriculture specialist.</p>
+    </div>
+  </section>
+
+  <!-- LIVESTOCK -->
+  <section class="panel" id="panel-livestock">
+    <div class="section-title">
+      <div><h2 data-i18n="livestockTitle">Livestock Monitoring</h2>
+      <div class="section-sub" data-i18n="livestockSub">Add an animal and log symptoms to get instant health alerts.</div></div>
+      <button class="btn gold" id="addAnimalBtn" data-i18n="addAnimal">+ Add Animal</button>
+    </div>
+    <div id="livestockList" class="grid"></div>
+  </section>
+
+  <!-- RECORDS -->
+  <section class="panel" id="panel-records">
+    <div class="section-title">
+      <div><h2 data-i18n="recordsTitle">Historical Farm Records</h2>
+      <div class="section-sub" data-i18n="recordsSub">Every season, crop, and treatment — logged and searchable.</div></div>
+      <button class="btn gold" id="addRecordBtn" data-i18n="addRecord">+ Add Record</button>
+    </div>
+    <div class="card">
+      <div id="recordsTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- ADVISORY -->
+  <section class="panel" id="panel-advisory">
+    <div class="section-title">
+      <div><h2 data-i18n="advisoryTitle">Advisory Services</h2>
+      <div class="section-sub" data-i18n="advisorySub">Pick your crop and growth stage for tailored guidance.</div></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label data-i18n="cropLabel">Crop</label>
+          <select id="advCrop"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="stageLabel">Growth Stage</label>
+          <select id="advStage"></select>
+        </div>
+      </div>
+      <button class="btn" id="getAdviceBtn" data-i18n="getAdvice">Get Advisory</button>
+      <div id="advisoryOutput" style="margin-top:16px;"></div>
+    </div>
+  </section>
+
+  <!-- WEATHER -->
+  <section class="panel" id="panel-weather">
+    <div class="section-title">
+      <div><h2 data-i18n="weatherTitle">Weather Forecast</h2>
+      <div class="section-sub" data-i18n="weatherSub">Live data for your exact location.</div></div>
+      <button class="btn outline small" id="locateBtn" data-i18n="useLocation">📍 Use my location</button>
+    </div>
+    <div id="weatherBody"><div class="empty-state"><div class="glyph">⛅</div><p data-i18n="weatherEmpty">Tap "Use my location" or search a place to see the forecast.</p></div></div>
+    <div class="card" style="margin-top:14px;">
+      <label data-i18n="searchPlaceLabel">Or search a place</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="placeSearch" placeholder="e.g. Ambikapur, Jodhpur, Nashik">
+        <button class="btn small" id="placeSearchBtn" data-i18n="search">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHATBOT -->
+  <section class="panel" id="panel-chatbot">
+    <div class="section-title">
+      <div><h2 data-i18n="chatTitle">Ayush</h2>
+      <div class="section-sub" data-i18n="chatSub">Type or speak — in your language.</div></div>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-input-row">
+        <button class="mic-btn" id="micBtn" title="Speak" aria-label="Voice input">🎤</button>
+        <input type="text" id="chatInput" placeholder="Type your question...">
+        <button class="btn" id="sendBtn" data-i18n="send">Send</button>
+      </div>
+    </div>
+    <p style="font-size:12px; color:var(--ink-soft); margin-top:8px;" id="voiceNote"></p>
+  </section>
+
+</main>
+
+<footer data-i18n="footerText">GramUnnat © 2026 — Empowering every farm with accessible digital tools.</footer>
+
+</div><!-- /appRoot -->
+
+<div class="toast" id="toast"></div>
+
+<!-- Add Animal Modal -->
+<div class="modal-bg" id="animalModalBg">
+  <div class="modal">
+    <h3 data-i18n="addAnimalTitle">Add Animal</h3>
+    <div class="field"><label data-i18n="animalType">Animal Type</label>
+      <select id="animalType"><option value="Cow">🐄 Cow</option><option value="Buffalo">🐃 Buffalo</option><option value="Goat">🐐 Goat</option><option value="Poultry">🐔 Poultry</option><option value="Sheep">🐑 Sheep</option></select>
+    </div>
+    <div class="field"><label data-i18n="animalId">Tag / Name</label><input type="text" id="animalId" placeholder="e.g. Gauri, #04"></div>
+    <div class="field"><label data-i18n="symptomsLabel">Symptoms observed (optional)</label>
+      <select id="animalSymptom">
+        <option value="none" data-i18n="symNone">None — routine check</option>
+        <option value="fever" data-i18n="symFever">Fever / high body temperature</option>
+        <option value="lameness" data-i18n="symLame">Lameness / difficulty walking</option>
+        <option value="appetite" data-i18n="symAppetite">Loss of appetite</option>
+        <option value="discharge" data-i18n="symDischarge">Nasal/eye discharge</option>
+        <option value="milkdrop" data-i18n="symMilk">Sudden drop in milk yield</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+      <button class="btn outline" id="cancelAnimal" data-i18n="cancel">Cancel</button>
+      <button class="btn gold" id="saveAnimal" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Record Modal -->
+<div class="modal-bg" id="recordModalBg">
+  <div class="modal">
+    <h3 data-i18n="addRecordTitle">Add Farm Record</h3>
+    <div class="field"><label data-i18n="recordCrop">Crop</label><input type="text" id="recCrop" placeholder="e.g. Wheat, Paddy, Soybean"></div>
+    <div class="row">
+      <div class="field"><label data-i18n="recordSeason">Season</label><input type="text" id="recSeason" placeholder="Rabi 2025"></div>
+      <div class="field"><label data-i18n="recordYield">Yield (quintal/acre)</label><input type="number" id="recYield" placeholder="e.g. 18"></div>
+    </div>
+    <div class="field"><label data-i18n="recordNotes">Treatment / notes</label><input type="text" id="recNotes" placeholder="e.g. Applied urea, no major pest issue"></div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+      <button class="btn outline" id="cancelRecord" data-i18n="cancel">Cancel</button>
+      <button class="btn gold" id="saveRecord" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= I18N ================= */
+const I18N = {
+  en: {
+    brandName:"GramUnnat", brandTag:"Digital Crop & Livestock Companion",
+    offlineReady:"Offline-ready",
+    heroTitle:"Namaste 🙏 — everything your farm needs, in one place",
+    heroSub:"Crop disease detection, livestock health monitoring, your farm's full history, and expert advisory — built for low bandwidth, spoken in your language.",
+    statRecords:"Farm Records", statLivestock:"Animals Tracked", statScans:"Crop Scans",
+    quickAccess:"Quick access",
+    navDisease:"Crop Disease ID", navDiseaseDesc:"Upload a leaf photo for instant AI-assisted diagnosis and treatment advice.",
+    navLivestock:"Livestock Monitoring", navLivestockDesc:"Track animal health, vaccinations, and get early warning alerts.",
+    navRecords:"Farm Records", navRecordsDesc:"Your full history of crops, yields, and treatments — always available.",
+    navAdvisory:"Advisory Services", navAdvisoryDesc:"Actionable, season-aware tips tailored to your crop and region.",
+    navWeather:"Weather Forecast", navWeatherDesc:"Live, location-based forecast with farming-specific alerts.",
+    navChat:"Ayush", navChatDesc:"Optional voice or text agricultural AI assistant.",
+    tabDashboard:"Dashboard", tabDisease:"Crop Disease", tabLivestock:"Livestock", tabRecords:"Records", tabAdvisory:"Advisory", tabWeather:"Weather", tabChat:"Ayush",
+    diseaseTitle:"Crop Disease Identification", diseaseSub:"Upload or capture a photo of the affected leaf/plant.",
+    uploadPrompt1:"Tap to upload or capture a photo", uploadPrompt2:"JPG or PNG · works with basic phone cameras",
+    analyzeBtn:"🔍 Diagnose", resetBtn:"Reset", demoModeTag:"AI-assisted result",
+    howItWorksTitle:"🔧 Responsible image diagnosis",
+    howItWorksDesc:"GramUnnat securely sends the selected image to a server-side vision model. Results are possible matches, not guaranteed diagnoses. Confirm severe, unusual, or fast-spreading symptoms with a local agriculture specialist.",
+    livestockTitle:"Livestock Monitoring", livestockSub:"Add an animal and log symptoms to get instant health alerts.", addAnimal:"+ Add Animal",
+    recordsTitle:"Historical Farm Records", recordsSub:"Every season, crop, and treatment — logged and searchable.", addRecord:"+ Add Record",
+    advisoryTitle:"Advisory Services", advisorySub:"Pick your crop and growth stage for tailored guidance.",
+    cropLabel:"Crop", stageLabel:"Growth Stage", getAdvice:"Get Advisory",
+    weatherTitle:"Weather Forecast", weatherSub:"Live data for your exact location.", useLocation:"📍 Use my location",
+    weatherEmpty:"Tap \"Use my location\" or search a place to see the forecast.", searchPlaceLabel:"Or search a place", search:"Search",
+    chatTitle:"Ayush", chatSub:"Your optional agricultural AI side assistant.", send:"Send",
+    footerText:"GramUnnat © 2026 — Empowering every farm with accessible digital tools.",
+    addAnimalTitle:"Add Animal", animalType:"Animal Type", animalId:"Tag / Name", symptomsLabel:"Symptoms observed (optional)",
+    symNone:"None — routine check", symFever:"Fever / high body temperature", symLame:"Lameness / difficulty walking",
+    symAppetite:"Loss of appetite", symDischarge:"Nasal/eye discharge", symMilk:"Sudden drop in milk yield",
+    cancel:"Cancel", save:"Save",
+    addRecordTitle:"Add Farm Record", recordCrop:"Crop", recordSeason:"Season", recordYield:"Yield (quintal/acre)", recordNotes:"Treatment / notes",
+    chatWelcome:"Namaste! I’m Ayush, your GramUnnat side assistant. Ask naturally about crops, animals, weather, records, or how to use the app.",
+    voiceNote:"🎤 Voice input/output uses your browser's built-in speech engine — works best in Chrome.",
+    micNotSupported:"Voice input isn't supported in this browser. Please type your question instead.",
+    listening:"Listening...",
+    noHindiVoice:"No Hindi voice found on this device — showing text reply only.",
+    yourLocation:"Your location", detectLoc:"Detect my location",
+    locationPrompt:"Tap detect to see your local weather at a glance.",
+    locatingText:"Detecting your location...", locDenied:"Location permission denied. Enable it in your browser settings.",
+    locNotSupported:"Location isn't supported on this device/browser.", locNoInternet:"Couldn't reach the network — check your internet connection.",
+    authSideTitle:"GramUnnat — one login for your whole farm",
+    authSideSub:"Crop disease help, animal health alerts, your farm history, weather and expert advice — all saved to your account, in your language.",
+    authFeat1:"Instant crop disease guidance", authFeat2:"Livestock health alerts", authFeat3:"Live weather for your exact location", authFeat4:"Voice chatbot in Hindi & English",
+    authSideFooter:"Your data is stored securely on this device.",
+    loginTab:"Log in", signupTab:"Sign up",
+    fieldName:"Full name", fieldPhone:"Phone number", fieldVillage:"Village / District", fieldPassword:"Password", fieldConfirmPassword:"Confirm password",
+    loginBtn:"Log in", signupBtn:"Create account", orDemo:"or", demoBtn:"👨‍🌾 Continue with demo farmer account",
+    authNote:"Your login stays on this device. Farm data is saved locally and securely synchronized through Netlify when available.",
+    authErrInvalid:"Please fill all required fields correctly.", authErrShort:"Password must be at least 4 characters.",
+    authErrPassMismatch:"Passwords do not match.", authErrPhoneExists:"An account with this phone number already exists.",
+    authErrNoUser:"No account found with this phone number.", authErrWrongPass:"Incorrect password.",
+    welcomeToast:"Welcome, {name}!",
+    logoutBtn:"Log out",
+  },
+  hi: {
+    brandName:"ग्रामोन्नत", brandTag:"डिजिटल फसल एवं पशुधन साथी",
+    offlineReady:"ऑफ़लाइन-तैयार",
+    heroTitle:"नमस्ते 🙏 — आपके खेत की हर ज़रूरत, एक ही जगह",
+    heroSub:"फसल रोग पहचान, पशुधन स्वास्थ्य निगरानी, आपके खेत का पूरा इतिहास, और विशेषज्ञ सलाह — कम इंटरनेट में भी, आपकी भाषा में।",
+    statRecords:"फसल रिकॉर्ड", statLivestock:"पशु दर्ज", statScans:"फसल स्कैन",
+    quickAccess:"त्वरित पहुँच",
+    navDisease:"फसल रोग पहचान", navDiseaseDesc:"तुरंत AI-सहायता से निदान और उपचार सलाह के लिए पत्ती की फोटो अपलोड करें।",
+    navLivestock:"पशुधन निगरानी", navLivestockDesc:"पशु स्वास्थ्य, टीकाकरण ट्रैक करें और समय पर चेतावनी पाएं।",
+    navRecords:"खेत रिकॉर्ड", navRecordsDesc:"आपकी फसलों, उपज और उपचार का पूरा इतिहास — हमेशा उपलब्ध।",
+    navAdvisory:"सलाहकार सेवाएं", navAdvisoryDesc:"आपकी फसल और क्षेत्र के अनुसार व्यावहारिक सुझाव।",
+    navWeather:"मौसम पूर्वानुमान", navWeatherDesc:"आपके स्थान पर आधारित लाइव पूर्वानुमान और कृषि चेतावनी।",
+    navChat:"आयुष", navChatDesc:"वैकल्पिक आवाज़ या टेक्स्ट कृषि AI सहायक।",
+    tabDashboard:"डैशबोर्ड", tabDisease:"फसल रोग", tabLivestock:"पशुधन", tabRecords:"रिकॉर्ड", tabAdvisory:"सलाह", tabWeather:"मौसम", tabChat:"आयुष",
+    diseaseTitle:"फसल रोग पहचान", diseaseSub:"प्रभावित पत्ती/पौधे की फोटो अपलोड या कैप्चर करें।",
+    uploadPrompt1:"फोटो अपलोड या कैप्चर करने के लिए टैप करें", uploadPrompt2:"JPG या PNG · सामान्य फोन कैमरे से भी चलेगा",
+    analyzeBtn:"🔍 निदान करें", resetBtn:"रीसेट", demoModeTag:"AI-सहायित परिणाम",
+    howItWorksTitle:"🔧 जिम्मेदार चित्र निदान",
+    howItWorksDesc:"ग्रामोन्नत चयनित चित्र को सुरक्षित सर्वर-साइड विज़न मॉडल को भेजता है। परिणाम संभावित पहचान हैं, पक्की चिकित्सा नहीं। गंभीर या तेजी से फैलते लक्षणों की स्थानीय कृषि विशेषज्ञ से पुष्टि करें।",
+    livestockTitle:"पशुधन निगरानी", livestockSub:"पशु जोड़ें और लक्षण दर्ज कर तुरंत चेतावनी पाएं।", addAnimal:"+ पशु जोड़ें",
+    recordsTitle:"खेत का इतिहास", recordsSub:"हर सीज़न, फसल और उपचार — दर्ज और खोजने योग्य।", addRecord:"+ रिकॉर्ड जोड़ें",
+    advisoryTitle:"सलाहकार सेवाएं", advisorySub:"अपनी फसल और वृद्धि चरण चुनें।",
+    cropLabel:"फसल", stageLabel:"वृद्धि चरण", getAdvice:"सलाह पाएं",
+    weatherTitle:"मौसम पूर्वानुमान", weatherSub:"आपके सटीक स्थान का लाइव डेटा।", useLocation:"📍 मेरा स्थान उपयोग करें",
+    weatherEmpty:"पूर्वानुमान देखने के लिए \"मेरा स्थान उपयोग करें\" दबाएं या जगह खोजें।", searchPlaceLabel:"या कोई जगह खोजें", search:"खोजें",
+    chatTitle:"आयुष", chatSub:"आपका वैकल्पिक कृषि AI सहायक।", send:"भेजें",
+    footerText:"ग्रामोन्नत © 2026 — हर खेत तक सुलभ डिजिटल तकनीक पहुंचाते हुए।",
+    addAnimalTitle:"पशु जोड़ें", animalType:"पशु प्रकार", animalId:"टैग / नाम", symptomsLabel:"देखे गए लक्षण (वैकल्पिक)",
+    symNone:"कोई नहीं — नियमित जांच", symFever:"बुखार / शरीर का तापमान अधिक", symLame:"लंगड़ापन / चलने में कठिनाई",
+    symAppetite:"भूख न लगना", symDischarge:"नाक/आंख से स्राव", symMilk:"दूध उत्पादन में अचानक गिरावट",
+    cancel:"रद्द करें", save:"सहेजें",
+    addRecordTitle:"खेत रिकॉर्ड जोड़ें", recordCrop:"फसल", recordSeason:"सीज़न", recordYield:"उपज (क्विंटल/एकड़)", recordNotes:"उपचार / टिप्पणी",
+    chatWelcome:"नमस्ते! मैं आयुष हूं, ग्रामोन्नत का सहायक। फसल, पशु, मौसम, रिकॉर्ड या ऐप के उपयोग के बारे में स्वाभाविक रूप से पूछें।",
+    voiceNote:"🎤 आवाज़ इनपुट/आउटपुट आपके ब्राउज़र के स्पीच इंजन का उपयोग करता है — Chrome में सबसे अच्छा काम करता है।",
+    micNotSupported:"इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है। कृपया अपना प्रश्न टाइप करें।",
+    listening:"सुन रहा हूं...",
+    noHindiVoice:"इस डिवाइस में हिन्दी आवाज़ नहीं मिली — केवल टेक्स्ट उत्तर दिखाया जा रहा है।",
+    yourLocation:"आपका स्थान", detectLoc:"मेरा स्थान पता करें",
+    locationPrompt:"अपने स्थान का मौसम देखने के लिए 'पता करें' दबाएं।",
+    locatingText:"आपका स्थान खोजा जा रहा है...", locDenied:"स्थान अनुमति अस्वीकृत। ब्राउज़र सेटिंग में इसे चालू करें।",
+    locNotSupported:"इस डिवाइस/ब्राउज़र में स्थान सेवा समर्थित नहीं है।", locNoInternet:"नेटवर्क तक नहीं पहुंच सके — इंटरनेट कनेक्शन जांचें।",
+    authSideTitle:"ग्रामोन्नत — आपके पूरे खेत के लिए एक लॉगिन",
+    authSideSub:"फसल रोग सहायता, पशु स्वास्थ्य चेतावनी, खेत का इतिहास, मौसम और विशेषज्ञ सलाह — सब आपके खाते में सुरक्षित, आपकी भाषा में।",
+    authFeat1:"तुरंत फसल रोग मार्गदर्शन", authFeat2:"पशुधन स्वास्थ्य चेतावनी", authFeat3:"आपके सटीक स्थान का लाइव मौसम", authFeat4:"हिन्दी व अंग्रेज़ी में वॉइस चैटबॉट",
+    authSideFooter:"आपका डेटा इस डिवाइस पर सुरक्षित रूप से संग्रहीत है।",
+    loginTab:"लॉग इन", signupTab:"साइन अप",
+    fieldName:"पूरा नाम", fieldPhone:"फ़ोन नंबर", fieldVillage:"गांव / ज़िला", fieldPassword:"पासवर्ड", fieldConfirmPassword:"पासवर्ड की पुष्टि करें",
+    loginBtn:"लॉग इन करें", signupBtn:"खाता बनाएं", orDemo:"या", demoBtn:"👨‍🌾 डेमो किसान खाते से जारी रखें",
+    authNote:"आपका लॉगिन इस डिवाइस पर रहता है। खेत का डेटा स्थानीय रूप से सहेजा जाता है और उपलब्ध होने पर Netlify से सुरक्षित सिंक होता है।",
+    authErrInvalid:"कृपया सभी आवश्यक फ़ील्ड सही तरीके से भरें।", authErrShort:"पासवर्ड कम से कम 4 अक्षर का होना चाहिए।",
+    authErrPassMismatch:"पासवर्ड मेल नहीं खाते।", authErrPhoneExists:"इस फ़ोन नंबर से पहले से खाता मौजूद है।",
+    authErrNoUser:"इस फ़ोन नंबर से कोई खाता नहीं मिला।", authErrWrongPass:"गलत पासवर्ड।",
+    welcomeToast:"स्वागत है, {name}!",
+    logoutBtn:"लॉग आउट",
+  }
+};
+let currentLang = ['en','hi'].includes(localStorage.getItem('gramunnat_language')) ? localStorage.getItem('gramunnat_language') : 'en';
+
+const LANGS = [
+  {code:'en', label:'English'}, {code:'hi', label:'हिन्दी (Hindi)'},
+];
+
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key; }
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  const vn = document.getElementById('voiceNote'); if(vn) vn.textContent = t('voiceNote');
+  buildTabs();
+  buildAdvisoryOptions();
+  renderLivestock();
+  renderRecords();
+  document.documentElement.lang = currentLang;
+}
+
+/* ================= AUTH ================= */
+let currentUser = null; // {phone, name, village}
+
+const usersDB = {
+  getAll(){ try{ return JSON.parse(localStorage.getItem('gramunnat_users_db')||'{}'); }catch(e){ return {}; } },
+  saveAll(obj){ try{ localStorage.setItem('gramunnat_users_db', JSON.stringify(obj)); }catch(e){} }
+};
+
+async function hashPass(pw){
+  try{
+    const enc = new TextEncoder().encode(pw);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){
+    let h = 0; for(let i=0;i<pw.length;i++){ h = (h*31 + pw.charCodeAt(i))|0; }
+    return 'fb'+h;
+  }
+}
+
+function normalizePhone(p){ return (p||'').replace(/\D/g,''); }
+
+function switchAuthTab(which){
+  document.getElementById('tabLoginBtn').classList.toggle('active', which==='login');
+  document.getElementById('tabSignupBtn').classList.toggle('active', which==='signup');
+  document.getElementById('loginForm').classList.toggle('active', which==='login');
+  document.getElementById('signupForm').classList.toggle('active', which==='signup');
+  document.getElementById('loginError').textContent='';
+  document.getElementById('signupError').textContent='';
+}
+document.getElementById('tabLoginBtn').onclick = ()=>switchAuthTab('login');
+document.getElementById('tabSignupBtn').onclick = ()=>switchAuthTab('signup');
+
+function completeLogin(user){
+  currentUser = user;
+  localStorage.setItem('gramunnat_session', user.phone);
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('appRoot').style.display='block';
+  document.getElementById('userNameDisplay').textContent = user.name;
+  loadUserData();
+  toast(t('welcomeToast').replace('{name}', user.name));
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const phone = normalizePhone(document.getElementById('liPhone').value);
+  const pass = document.getElementById('liPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent='';
+  const users = usersDB.getAll();
+  if(!users[phone]){ errEl.textContent = t('authErrNoUser'); return; }
+  const hash = await hashPass(pass);
+  if(users[phone].passHash !== hash){ errEl.textContent = t('authErrWrongPass'); return; }
+  completeLogin({phone, name:users[phone].name, village:users[phone].village});
+});
+
+document.getElementById('signupForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('suName').value.trim();
+  const phone = normalizePhone(document.getElementById('suPhone').value);
+  const village = document.getElementById('suVillage').value.trim();
+  const pass = document.getElementById('suPass').value;
+  const pass2 = document.getElementById('suPass2').value;
+  const errEl = document.getElementById('signupError');
+  errEl.textContent='';
+  if(!name || phone.length<7 || !pass){ errEl.textContent = t('authErrInvalid'); return; }
+  if(pass.length<4){ errEl.textContent = t('authErrShort'); return; }
+  if(pass!==pass2){ errEl.textContent = t('authErrPassMismatch'); return; }
+  const users = usersDB.getAll();
+  if(users[phone]){ errEl.textContent = t('authErrPhoneExists'); return; }
+  const passHash = await hashPass(pass);
+  users[phone] = {name, village, passHash};
+  usersDB.saveAll(users);
+  completeLogin({phone, name, village});
+});
+
+document.getElementById('demoLoginBtn').onclick = async ()=>{
+  const phone = 'demo9999999999';
+  const users = usersDB.getAll();
+  let isNew = false;
+  if(!users[phone]){
+    isNew = true;
+    users[phone] = {
+      name: currentLang==='hi' ? 'राजू किसान' : 'Raju Farmer',
+      village: currentLang==='hi' ? 'रामपुर, मध्य प्रदेश' : 'Rampur, Madhya Pradesh',
+      passHash: await hashPass('demo1234')
+    };
+    usersDB.saveAll(users);
+  }
+  completeLogin({phone, name:users[phone].name, village:users[phone].village});
+  if(isNew) seedDemoData();
+};
+
+document.getElementById('logoutBtn').onclick = ()=>{
+  localStorage.removeItem('gramunnat_session');
+  currentUser = null;
+  location.reload();
+};
+
+function trySessionRestore(){
+  const phone = localStorage.getItem('gramunnat_session');
+  if(!phone) return;
+  const users = usersDB.getAll();
+  if(users[phone]){
+    currentUser = {phone, name:users[phone].name, village:users[phone].village};
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('appRoot').style.display='block';
+    document.getElementById('userNameDisplay').textContent = currentUser.name;
+    loadUserData();
+  }
+}
+
+/* ================= TABS ================= */
+const TAB_DEFS = [
+  {id:'dashboard', icon:'🏠', key:'tabDashboard'},
+  {id:'disease', icon:'🌿', key:'tabDisease'},
+  {id:'livestock', icon:'🐄', key:'tabLivestock'},
+  {id:'records', icon:'📋', key:'tabRecords'},
+  {id:'advisory', icon:'💡', key:'tabAdvisory'},
+  {id:'weather', icon:'⛅', key:'tabWeather'},
+  {id:'chatbot', icon:'💬', key:'tabChat'},
+];
+let activeTab = 'dashboard';
+
+function buildTabs(){
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  TAB_DEFS.forEach(tab=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (tab.id===activeTab ? ' active':'');
+    btn.innerHTML = `<span>${tab.icon}</span><span>${t(tab.key)}</span>`;
+    btn.onclick = ()=>goTo(tab.id);
+    bar.appendChild(btn);
+  });
+}
+function goTo(id){
+  activeTab = id;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  buildTabs();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.nav-card').forEach(c=>{
+  c.addEventListener('click', ()=>goTo(c.getAttribute('data-goto')));
+});
+
+/* ================= TOAST ================= */
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+/* ================= STORAGE (per-user) ================= */
+const store = {
+  scopedKey(key){ return `gramunnat_${currentUser ? currentUser.phone : 'anon'}_${key}`; },
+  get(key, fallback){ try{ const v = localStorage.getItem(this.scopedKey(key)); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } },
+  set(key, val){ try{ localStorage.setItem(this.scopedKey(key), JSON.stringify(val)); }catch(e){} }
+};
+let livestock = [];
+let records = [];
+let scanCount = 0;
+
+function loadUserData(){
+  livestock = store.get('livestock', []);
+  records = store.get('records', []);
+  scanCount = store.get('scanCount', 0);
+  renderLivestock();
+  renderRecords();
+  updateStats();
+}
+
+function seedDemoData(){
+  livestock = [
+    {type:'Cow', id: currentLang==='hi' ? 'गौरी' : 'Gauri', symptom:'none', date: Date.now()-86400000*2},
+    {type:'Goat', id:'#04', symptom:'appetite', date: Date.now()-86400000*1},
+  ];
+  records = [
+    {crop: currentLang==='hi' ? 'गेहूं' : 'Wheat', season:'Rabi 2025', yieldVal:'18', notes: currentLang==='hi' ? 'यूरिया डाला, कोई बड़ी कीट समस्या नहीं' : 'Applied urea, no major pest issue', date: Date.now()-86400000*40},
+  ];
+  scanCount = 1;
+  store.set('livestock', livestock);
+  store.set('records', records);
+  store.set('scanCount', scanCount);
+  renderLivestock(); renderRecords(); updateStats();
+}
+
+function updateStats(){
+  document.getElementById('statRecords').textContent = records.length;
+  document.getElementById('statLivestock').textContent = livestock.length;
+  document.getElementById('statScans').textContent = scanCount;
+}
+
+/* ================= LIVESTOCK ================= */
+const SYMPTOM_INFO = {
+  none: {badge:'ok', textEn:'Healthy — routine check logged', textHi:'स्वस्थ — नियमित जांच दर्ज'},
+  fever: {badge:'bad', textEn:'Possible infection — isolate & consult vet within 24h', textHi:'संभावित संक्रमण — अलग रखें व 24 घंटे में पशु चिकित्सक से मिलें'},
+  lameness: {badge:'warn', textEn:'Check hooves for injury/foot rot; rest on dry bedding', textHi:'खुरों में चोट/फुट रॉट जांचें; सूखी जगह पर आराम दें'},
+  appetite: {badge:'warn', textEn:'Monitor closely; check water & feed quality', textHi:'बारीकी से निगरानी करें; पानी व चारे की गुणवत्ता जांचें'},
+  discharge: {badge:'bad', textEn:'Possible respiratory issue — separate from herd, consult vet', textHi:'संभावित श्वसन समस्या — झुंड से अलग करें, पशु चिकित्सक से मिलें'},
+  milkdrop: {badge:'warn', textEn:'Could indicate mastitis or stress — check udder health', textHi:'मैस्टाइटिस या तनाव का संकेत — थन की जांच करें'},
+};
+function renderLivestock(){
+  const wrap = document.getElementById('livestockList');
+  if(!wrap) return;
+  if(livestock.length===0){
+    wrap.innerHTML = `<div class="card empty-state" style="grid-column:1/-1;"><div class="glyph">🐄</div><p>${currentLang==='hi'?'अभी कोई पशु दर्ज नहीं। "पशु जोड़ें" दबाएं।':'No animals added yet. Tap "Add Animal" to start tracking.'}</p></div>`;
+    updateStats(); return;
+  }
+  wrap.innerHTML = livestock.map((a,i)=>{
+    const info = SYMPTOM_INFO[a.symptom] || SYMPTOM_INFO.none;
+    const badgeClass = info.badge;
+    const badgeLabel = badgeClass==='ok' ? (currentLang==='hi'?'स्वस्थ':'Healthy') : badgeClass==='bad' ? (currentLang==='hi'?'चेतावनी':'Alert') : (currentLang==='hi'?'नज़र रखें':'Watch');
+    const desc = currentLang==='hi' ? info.textHi : info.textEn;
+    const icon = {Cow:'🐄',Buffalo:'🐃',Goat:'🐐',Poultry:'🐔',Sheep:'🐑'}[a.type] || '🐾';
+    return `<div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <h3>${icon} ${a.id}</h3>
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+      </div>
+      <p style="margin-bottom:8px;">${a.type} · ${new Date(a.date).toLocaleDateString()}</p>
+      <p>${desc}</p>
+      <button class="btn outline small" style="margin-top:10px;" onclick="removeAnimal(${i})">${currentLang==='hi'?'हटाएं':'Remove'}</button>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+function removeAnimal(i){ livestock.splice(i,1); store.set('livestock', livestock); renderLivestock(); toast(currentLang==='hi'?'हटाया गया':'Removed'); }
+
+document.getElementById('addAnimalBtn').onclick = ()=>document.getElementById('animalModalBg').classList.add('show');
+document.getElementById('cancelAnimal').onclick = ()=>document.getElementById('animalModalBg').classList.remove('show');
+document.getElementById('saveAnimal').onclick = ()=>{
+  const type = document.getElementById('animalType').value;
+  const id = document.getElementById('animalId').value.trim() || (type+' #'+(livestock.length+1));
+  const symptom = document.getElementById('animalSymptom').value;
+  livestock.push({type, id, symptom, date: Date.now()});
+  store.set('livestock', livestock);
+  document.getElementById('animalModalBg').classList.remove('show');
+  document.getElementById('animalId').value = '';
+  renderLivestock();
+  toast(currentLang==='hi' ? 'पशु सहेजा गया' : 'Animal saved');
+  if(symptom!=='none' && (SYMPTOM_INFO[symptom].badge==='bad')){
+    setTimeout(()=>toast(currentLang==='hi' ? '⚠ स्वास्थ्य चेतावनी दर्ज हुई' : '⚠ Health alert logged for this animal'), 2400);
+  }
+};
+
+/* ================= RECORDS ================= */
+function renderRecords(){
+  const wrap = document.getElementById('recordsTableWrap');
+  if(!wrap) return;
+  if(records.length===0){
+    wrap.innerHTML = `<div class="empty-state"><div class="glyph">📋</div><p>${currentLang==='hi'?'अभी कोई रिकॉर्ड नहीं। "रिकॉर्ड जोड़ें" दबाएं।':'No records yet. Tap "Add Record" to log your first season.'}</p></div>`;
+    updateStats(); return;
+  }
+  const rows = records.slice().reverse().map((r, idx)=>{
+    const i = records.length-1-idx;
+    return `<tr>
+      <td><strong>${r.crop}</strong></td>
+      <td>${r.season||'—'}</td>
+      <td>${r.yieldVal ? r.yieldVal+' q/acre' : '—'}</td>
+      <td>${r.notes||'—'}</td>
+      <td><button class="btn outline small" onclick="removeRecord(${i})">${currentLang==='hi'?'हटाएं':'Remove'}</button></td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table><thead><tr>
+    <th>${currentLang==='hi'?'फसल':'Crop'}</th><th>${currentLang==='hi'?'सीज़न':'Season'}</th>
+    <th>${currentLang==='hi'?'उपज':'Yield'}</th><th>${currentLang==='hi'?'टिप्पणी':'Notes'}</th><th></th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
+  updateStats();
+}
+function removeRecord(i){ records.splice(i,1); store.set('records', records); renderRecords(); toast(currentLang==='hi'?'हटाया गया':'Removed'); }
+
+document.getElementById('addRecordBtn').onclick = ()=>document.getElementById('recordModalBg').classList.add('show');
+document.getElementById('cancelRecord').onclick = ()=>document.getElementById('recordModalBg').classList.remove('show');
+document.getElementById('saveRecord').onclick = ()=>{
+  const crop = document.getElementById('recCrop').value.trim();
+  if(!crop){ toast(currentLang==='hi'?'कृपया फसल दर्ज करें':'Please enter a crop'); return; }
+  records.push({
+    crop, season:document.getElementById('recSeason').value.trim(),
+    yieldVal:document.getElementById('recYield').value, notes:document.getElementById('recNotes').value.trim(),
+    date:Date.now()
+  });
+  store.set('records', records);
+  ['recCrop','recSeason','recYield','recNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('recordModalBg').classList.remove('show');
+  renderRecords();
+  toast(currentLang==='hi'?'रिकॉर्ड सहेजा गया':'Record saved');
+};
+
+/* ================= CROP DISEASE (simulated) ================= */
+const DISEASE_DB = [
+  {name:{en:'Leaf Blight', hi:'पत्ती झुलसा रोग'}, crop:'Wheat/Rice', treatment:{en:'Apply Mancozeb 75% WP @ 2.5g/L water. Remove and destroy infected leaves. Avoid overhead irrigation.', hi:'मैंकोज़ेब 75% WP @ 2.5 ग्राम/लीटर पानी में छिड़कें। संक्रमित पत्तियां हटाकर नष्ट करें। ऊपर से सिंचाई न करें।'}},
+  {name:{en:'Powdery Mildew', hi:'चूर्णिल आसिता'}, crop:'Vegetables', treatment:{en:'Use an appropriately labeled sulfur-based fungicide only after checking local guidance. Improve air circulation between plants.', hi:'स्थानीय मार्गदर्शन और उत्पाद लेबल देखकर ही उपयुक्त सल्फर आधारित फफूंदनाशक का उपयोग करें। पौधों के बीच हवा का आवागमन बढ़ाएं।'}},
+  {name:{en:'Bacterial Leaf Spot', hi:'जीवाणु पत्ती धब्बा'}, crop:'Cotton/Vegetables', treatment:{en:'Apply Copper Oxychloride @ 3g/L. Use disease-free seeds next season and rotate crops.', hi:'कॉपर ऑक्सीक्लोराइड @ 3 ग्राम/ली छिड़कें। अगली फसल में रोगमुक्त बीज व फसल चक्र अपनाएं।'}},
+  {name:{en:'Healthy Leaf', hi:'स्वस्थ पत्ती'}, crop:'—', treatment:{en:'No disease detected. Continue regular monitoring and balanced fertilization.', hi:'कोई रोग नहीं मिला। नियमित निगरानी व संतुलित उर्वरक जारी रखें।'}},
+  {name:{en:'Rust Disease', hi:'रतुआ रोग'}, crop:'Wheat', treatment:{en:'Apply Propiconazole 25% EC @ 1ml/L at first sign. Sow rust-resistant varieties next season.', hi:'पहले लक्षण पर प्रोपिकोनाज़ोल 25% EC @ 1 मिली/ली छिड़कें। अगली बार रतुआ-प्रतिरोधी किस्में बोएं।'}},
+];
+let uploadedImageData = null;
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+uploadZone.addEventListener('click', ()=>fileInput.click());
+fileInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    uploadedImageData = ev.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = uploadedImageData;
+    img.style.display = 'block';
+    document.getElementById('uploadPrompt').style.display = 'none';
+    uploadZone.classList.add('has-image');
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('analysisResult').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('resetUploadBtn').onclick = ()=>{
+  uploadedImageData = null;
+  fileInput.value = '';
+  document.getElementById('previewImg').style.display = 'none';
+  document.getElementById('uploadPrompt').style.display = 'block';
+  uploadZone.classList.remove('has-image');
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('analysisResult').style.display = 'none';
+};
+document.getElementById('analyzeBtn').onclick = ()=>{
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.textContent = currentLang==='hi' ? 'विश्लेषण हो रहा है...' : 'Analyzing...';
+  setTimeout(()=>{
+    let seed = 0;
+    if(uploadedImageData){ for(let i=0;i<Math.min(500,uploadedImageData.length); i+=7) seed += uploadedImageData.charCodeAt(i); }
+    const idx = seed % DISEASE_DB.length;
+    const disease = DISEASE_DB[idx];
+    const confidence = 78 + (seed % 18);
+    scanCount++; store.set('scanCount', scanCount);
+    const resBody = document.getElementById('resultBody');
+    const name = disease.name[currentLang] || disease.name.en;
+    const treatment = disease.treatment[currentLang] || disease.treatment.en;
+    const isHealthy = idx===3;
+    resBody.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <h3 style="margin:0;">${isHealthy?'✅':'🔬'} ${name}</h3>
+        <span class="badge ${isHealthy?'ok':'warn'}">${confidence}% ${currentLang==='hi'?'विश्वास':'confidence'}</span>
+      </div>
+      <div class="confidence-bar"><div class="confidence-fill" style="width:${confidence}%;"></div></div>
+      <p style="margin-top:12px;"><strong>${currentLang==='hi'?'सुझाया गया उपचार:':'Recommended treatment:'}</strong> ${treatment}</p>
+      <p style="margin-top:8px; font-size:12.5px; color:var(--ink-soft);">${currentLang==='hi'?'फसल श्रेणी':'Likely crop group'}: ${disease.crop}</p>
+    `;
+    document.getElementById('analysisResult').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = t('analyzeBtn');
+    updateStats();
+  }, 1100);
+};
+
+/* ================= ADVISORY ================= */
+const CROPS = ['Wheat','Rice','Cotton','Soybean','Maize','Sugarcane','Vegetables','Pulses'];
+const STAGES = {
+  en:['Sowing','Vegetative Growth','Flowering','Fruiting/Grain-fill','Harvest'],
+  hi:['बुवाई','वानस्पतिक वृद्धि','फूल आना','दाना/फल भरना','कटाई']
+};
+const ADVISORY_TIPS = {
+  en:{
+    Sowing:'Ensure proper seed treatment with fungicide before sowing. Maintain recommended row spacing. Check soil moisture before planting.',
+    'Vegetative Growth':'Apply first dose of nitrogen fertilizer. Monitor for early pest signs. Weed control is critical in this stage.',
+    Flowering:'Avoid water stress during flowering — this is the most sensitive stage. Watch for pollinator activity and pest pressure.',
+    'Fruiting/Grain-fill':'Ensure adequate potassium. Protect from birds/pests. Reduce nitrogen to avoid excess vegetative growth.',
+    Harvest:'Harvest at optimal moisture content to reduce losses. Plan storage to protect from pests and moisture.'
+  },
+  hi:{
+    'बुवाई':'बुवाई से पहले बीज को फफूंदनाशक से उपचारित करें। सही कतार दूरी बनाए रखें। रोपण से पहले मिट्टी की नमी जांचें।',
+    'वानस्पतिक वृद्धि':'नाइट्रोजन उर्वरक की पहली खुराक दें। कीट के शुरुआती लक्षणों पर नज़र रखें। इस चरण में खरपतवार नियंत्रण महत्वपूर्ण है।',
+    'फूल आना':'फूल आने के दौरान पानी की कमी न होने दें — यह सबसे संवेदनशील चरण है। परागणकों और कीट दबाव पर नज़र रखें।',
+    'दाना/फल भरना':'पर्याप्त पोटैशियम सुनिश्चित करें। पक्षियों/कीटों से सुरक्षा करें। अत्यधिक वानस्पतिक वृद्धि रोकने हेतु नाइट्रोजन कम करें।',
+    'कटाई':'नुकसान कम करने के लिए उचित नमी स्तर पर कटाई करें। कीट व नमी से बचाव हेतु भंडारण की योजना बनाएं।'
+  }
+};
+function buildAdvisoryOptions(){
+  const cropSel = document.getElementById('advCrop');
+  if(!cropSel) return;
+  cropSel.innerHTML = CROPS.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const stageSel = document.getElementById('advStage');
+  const stages = STAGES[currentLang] || STAGES.en;
+  stageSel.innerHTML = stages.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+document.getElementById('getAdviceBtn').onclick = ()=>{
+  const crop = document.getElementById('advCrop').value;
+  const stage = document.getElementById('advStage').value;
+  const tipsMap = ADVISORY_TIPS[currentLang] || ADVISORY_TIPS.en;
+  const tip = tipsMap[stage] || '';
+  document.getElementById('advisoryOutput').innerHTML = `
+    <div class="card" style="background:#fbf8f1;">
+      <h3>💡 ${crop} — ${stage}</h3>
+      <p>${tip}</p>
+    </div>`;
+};
+
+/* ================= LOCATION + WEATHER ================= */
+const WCODE = {
+  0:{en:'Clear sky',hi:'साफ आसमान',ic:'☀️'}, 1:{en:'Mainly clear',hi:'लगभग साफ',ic:'🌤️'}, 2:{en:'Partly cloudy',hi:'आंशिक बादल',ic:'⛅'},
+  3:{en:'Overcast',hi:'घना बादल',ic:'☁️'}, 45:{en:'Fog',hi:'कोहरा',ic:'🌫️'}, 48:{en:'Fog',hi:'कोहरा',ic:'🌫️'},
+  51:{en:'Light drizzle',hi:'हल्की बूंदाबांदी',ic:'🌦️'}, 61:{en:'Light rain',hi:'हल्की बारिश',ic:'🌧️'}, 63:{en:'Rain',hi:'बारिश',ic:'🌧️'},
+  65:{en:'Heavy rain',hi:'भारी बारिश',ic:'🌧️'}, 71:{en:'Light snow',hi:'हल्की बर्फ',ic:'🌨️'}, 80:{en:'Rain showers',hi:'बौछारें',ic:'🌦️'},
+  95:{en:'Thunderstorm',hi:'आंधी-तूफान',ic:'⛈️'},
+};
+function wcodeInfo(code){ return WCODE[code] || {en:'—',hi:'—',ic:'🌡️'}; }
+
+let lastLocation = null; // {lat, lon, name}
+
+async function reverseGeocode(lat, lon){
+  try{
+    const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${currentLang==='hi'?'hi':'en'}`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const place = [data.locality || data.city, data.principalSubdivision].filter(Boolean).join(', ');
+    return place || (currentLang==='hi'?'आपका स्थान':'Your location');
+  }catch(e){
+    return currentLang==='hi'?'आपका स्थान':'Your location';
+  }
+}
+
+function getCurrentPositionAsync(){
+  return new Promise((resolve, reject)=>{
+    if(!navigator.geolocation){ reject(new Error('unsupported')); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve(pos.coords),
+      err=>reject(err),
+      {timeout:12000, maximumAge:60000}
+    );
+  });
+}
+
+document.getElementById('detectLocBtn').onclick = async ()=>{
+  const statusEl = document.getElementById('locationStatusText');
+  if(!navigator.geolocation){ toast(t('locNotSupported')); return; }
+  statusEl.textContent = t('locatingText');
+  try{
+    const coords = await getCurrentPositionAsync();
+    const {latitude:lat, longitude:lon} = coords;
+    const name = await reverseGeocode(lat, lon);
+    lastLocation = {lat, lon, name};
+    try{
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`);
+      const data = await res.json();
+      const info = wcodeInfo(data.current.weather_code);
+      const desc = currentLang==='hi'?info.hi:info.en;
+      statusEl.textContent = `${name} · ${Math.round(data.current.temperature_2m)}°C ${info.ic} ${desc}`;
+    }catch(netErr){
+      statusEl.textContent = `${name} · ${t('locNoInternet')}`;
+    }
+  }catch(err){
+    if(err && err.message==='unsupported'){ statusEl.textContent = t('locNotSupported'); }
+    else{ statusEl.textContent = t('locDenied'); }
+  }
+};
+
+async function loadWeather(lat, lon, placeName){
+  document.getElementById('weatherBody').innerHTML = `<div class="empty-state"><div class="glyph">⏳</div><p>${currentLang==='hi'?'मौसम लोड हो रहा है...':'Loading weather...'}</p></div>`;
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
+    const res = await fetch(url);
+    const data = await res.json();
+    renderWeather(data, placeName);
+  }catch(err){
+    document.getElementById('weatherBody').innerHTML = `<div class="empty-state"><div class="glyph">⚠️</div><p>${currentLang==='hi'?'मौसम लोड नहीं हो सका। इंटरनेट जांचें।':'Could not load weather. Check your connection.'}</p></div>`;
+  }
+}
+function renderWeather(data, placeName){
+  const cur = data.current;
+  const info = wcodeInfo(cur.weather_code);
+  const desc = currentLang==='hi' ? info.hi : info.en;
+  let alert = '';
+  if(cur.weather_code>=61 && cur.weather_code<80){
+    alert = currentLang==='hi' ? '🌧️ बारिश की संभावना — छिड़काव कार्य स्थगित करें।' : '🌧️ Rain likely — postpone spraying operations.';
+  } else if(data.daily.precipitation_probability_max[0] > 60){
+    alert = currentLang==='hi' ? '⚠️ आज बारिश की उच्च संभावना — फसल सुरक्षा योजना बनाएं।' : '⚠️ High chance of rain today — plan crop protection accordingly.';
+  } else if(cur.temperature_2m > 38){
+    alert = currentLang==='hi' ? '🌡️ अत्यधिक गर्मी — पशुओं के लिए पर्याप्त पानी व छाया सुनिश्चित करें।' : '🌡️ Extreme heat — ensure adequate water and shade for livestock.';
+  }
+  const days = data.daily.time.slice(0,5).map((d,i)=>{
+    const dcode = wcodeInfo(data.daily.weather_code[i]);
+    const dayName = new Date(d).toLocaleDateString(currentLang==='hi'?'hi-IN':'en-US', {weekday:'short'});
+    return `<div class="fday"><div class="d">${dayName}</div><div class="ic">${dcode.ic}</div><div class="t">${Math.round(data.daily.temperature_2m_max[i])}° / ${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
+  }).join('');
+  document.getElementById('weatherBody').innerHTML = `
+    <div class="weather-hero">
+      <div>
+        <div style="font-size:13px; opacity:0.85;">📍 ${placeName||'—'}</div>
+        <div class="weather-temp">${Math.round(cur.temperature_2m)}°C</div>
+        <div>${info.ic} ${desc}</div>
+      </div>
+      <div style="text-align:right; font-size:13px; opacity:0.9;">
+        <div>💧 ${currentLang==='hi'?'नमी':'Humidity'}: ${cur.relative_humidity_2m}%</div>
+        <div>💨 ${currentLang==='hi'?'हवा':'Wind'}: ${Math.round(cur.wind_speed_10m)} km/h</div>
+        <div>🌧️ ${currentLang==='hi'?'वर्षा':'Precipitation'}: ${cur.precipitation ?? 0} mm</div>
+      </div>
+    </div>
+    ${alert ? `<div class="card" style="margin-top:12px; border-left:4px solid var(--wheat-dark);"><p><strong>${currentLang==='hi'?'सलाह':'Advisory'}:</strong> ${alert}</p><p style="font-size:12px;margin-top:6px;opacity:.8">${currentLang==='hi'?'यह सामान्य कृषि मार्गदर्शन है, गारंटीकृत पेशेवर उपचार नहीं।':'This is general agricultural guidance, not guaranteed professional treatment.'}</p></div>` : ''}
+    <div class="forecast-strip">${days}</div>
+  `;
+}
+document.getElementById('locateBtn').onclick = async ()=>{
+  if(!navigator.geolocation){ toast(t('locNotSupported')); return; }
+  toast(currentLang==='hi'?'स्थान प्राप्त हो रहा है...':'Getting your location...');
+  try{
+    const coords = await getCurrentPositionAsync();
+    const name = await reverseGeocode(coords.latitude, coords.longitude);
+    lastLocation = {lat:coords.latitude, lon:coords.longitude, name};
+    loadWeather(coords.latitude, coords.longitude, name);
+  }catch(err){
+    toast(t('locDenied'));
+  }
+};
+document.getElementById('placeSearchBtn').onclick = async ()=>{
+  const q = document.getElementById('placeSearch').value.trim();
+  if(!q) return;
+  try{
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=en`);
+    const geo = await geoRes.json();
+    if(geo.results && geo.results.length){
+      const r = geo.results[0];
+      const searchedName = r.name + (r.admin1 ? ', '+r.admin1 : '');
+      lastLocation = {lat:r.latitude, lon:r.longitude, name:searchedName};
+      loadWeather(r.latitude, r.longitude, searchedName);
+    } else {
+      toast(currentLang==='hi'?'जगह नहीं मिली':'Place not found');
+    }
+  }catch(e){ toast(currentLang==='hi'?'खोज विफल':'Search failed'); }
+};
+document.getElementById('placeSearch').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('placeSearchBtn').click(); });
+
+/* ================= CHATBOT ================= */
+const CHAT_RULES = [
+  { kws:['disease','fungus','blight','spot','leaf','रोग','फंगस','धब्बा','पत्ती'],
+    en:"For crop disease, upload a photo in the 'Crop Disease ID' tab for instant analysis. In general: remove infected leaves, avoid overhead watering, and use a recommended fungicide such as Mancozeb or Copper Oxychloride at first sign of spots.",
+    hi:"फसल रोग के लिए 'फसल रोग पहचान' टैब में फोटो अपलोड करें। सामान्यतः: संक्रमित पत्तियां हटाएं, ऊपर से सिंचाई न करें, और धब्बे दिखते ही अनुशंसित फफूंदनाशक जैसे मैंकोज़ेब का प्रयोग करें।" },
+  { kws:['cattle','cow','buffalo','goat','livestock','animal','पशु','गाय','भैंस','बकरी'],
+    en:"For livestock, log symptoms in the 'Livestock' tab and it will flag urgent cases automatically. General rule: isolate any animal with fever or discharge, and consult a vet within 24 hours for red flag symptoms.",
+    hi:"पशुधन के लिए 'पशुधन' टैब में लक्षण दर्ज करें, यह तुरंत जरूरी मामलों को चिन्हित करेगा। सामान्य नियम: बुखार या स्राव वाले पशु को अलग रखें और गंभीर लक्षणों पर 24 घंटे में पशु चिकित्सक से मिलें।" },
+  { kws:['weather','rain','forecast','मौसम','बारिश','पूर्वानुमान'],
+    en:"Check the 'Weather' tab for a live 5 day forecast for your exact location, plus farming alerts such as postponing spraying before rain.",
+    hi:"अपने स्थान का 5 दिन का लाइव पूर्वानुमान और खेती चेतावनी के लिए 'मौसम' टैब देखें।" },
+  { kws:['scheme','subsidy','government','yojana','योजना','सब्सिडी','सरकार'],
+    en:"Common schemes for farmers include PM KISAN for income support, PMFBY for crop insurance, and Kisan Credit Card for low interest loans. Visit your nearest Krishi Vigyan Kendra or pmkisan.gov.in for application help.",
+    hi:"किसानों के लिए मुख्य योजनाएं: PM किसान (आय सहायता), PMFBY (फसल बीमा), और किसान क्रेडिट कार्ड (कम ब्याज ऋण)। आवेदन सहायता हेतु निकटतम कृषि विज्ञान केंद्र या pmkisan.gov.in देखें।" },
+  { kws:['irrigation','water','सिंचाई','पानी'],
+    en:"For water efficiency, consider drip irrigation for row crops. It can cut water use by 30 to 50 percent. Irrigate early morning or evening to reduce evaporation loss.",
+    hi:"पानी बचाने हेतु ड्रिप सिंचाई अपनाएं, यह 30 से 50 प्रतिशत पानी बचा सकती है। वाष्पीकरण कम करने हेतु सुबह या शाम सिंचाई करें।" },
+  { kws:['hello','hi','namaste','नमस्ते','हैलो'],
+    en:"Namaste! How can I help — crop disease, livestock, weather, or advisory?",
+    hi:"नमस्ते! मैं कैसे मदद कर सकता हूं — फसल रोग, पशुधन, मौसम या सलाह?" },
+];
+function botReply(msg){
+  const lower = msg.toLowerCase();
+  for(const rule of CHAT_RULES){
+    if(rule.kws.some(k=>lower.includes(k.toLowerCase()))){
+      return currentLang==='hi' ? rule.hi : rule.en;
+    }
+  }
+  return currentLang==='hi'
+    ? "मुझे यकीन नहीं है, लेकिन मैं फसल रोग, पशुधन स्वास्थ्य, मौसम, सिंचाई और सरकारी योजनाओं पर मदद कर सकता हूं। कृपया और विस्तार से बताएं।"
+    : "I'm not fully sure, but I can help with crop diseases, livestock health, weather, irrigation, and government schemes. Could you tell me a bit more?";
+}
+function addMsg(text, who){
+  const log = document.getElementById('chatLog');
+  const div = document.createElement('div');
+  div.className = 'msg '+who;
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ---- Speech synthesis (fixed): loads voices async, picks a matching voice, and strips symbols the browser would otherwise read aloud (e.g. "*", "#", "/") ---- */
+let voicesList = [];
+function refreshVoices(){ voicesList = ('speechSynthesis' in window) ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+function pickVoice(lang){
+  if(!voicesList.length) return null;
+  let v = voicesList.find(vc=>vc.lang.toLowerCase()===lang.toLowerCase());
+  if(v) return v;
+  const short = lang.split('-')[0];
+  v = voicesList.find(vc=>vc.lang.toLowerCase().startsWith(short));
+  return v || null;
+}
+function sanitizeForSpeech(text){
+  return text
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/_/g, ' ')
+    .replace(/#/g, '')
+    .replace(/`/g, '')
+    .replace(/\//g, currentLang==='hi' ? ' या ' : ' or ')
+    .replace(/[<>~^|]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  const clean = sanitizeForSpeech(text);
+  if(!clean) return;
+  refreshVoices();
+  const targetLang = currentLang==='hi' ? 'hi-IN' : 'en-IN';
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang = targetLang;
+  utter.rate = 0.95;
+  const voice = pickVoice(targetLang);
+  if(voice){
+    utter.voice = voice;
+  } else if(currentLang==='hi'){
+    toast(t('noHindiVoice'));
+  }
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+function sendChat(){
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if(!val) return;
+  addMsg(val, 'user');
+  input.value = '';
+  setTimeout(()=>{
+    const reply = botReply(val);
+    addMsg(reply, 'bot');
+    speak(reply);
+  }, 350);
+}
+document.getElementById('sendBtn').onclick = sendChat;
+document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+
+// Voice input
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+if(SpeechRecognition){
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+}
+document.getElementById('micBtn').onclick = ()=>{
+  const micBtn = document.getElementById('micBtn');
+  if(!recognition){ toast(t('micNotSupported')); return; }
+  recognition.lang = currentLang==='hi' ? 'hi-IN' : 'en-IN';
+  micBtn.classList.add('listening');
+  toast(t('listening'));
+  recognition.start();
+  recognition.onresult = (e)=>{
+    const text = e.results[0][0].transcript;
+    document.getElementById('chatInput').value = text;
+    sendChat();
+  };
+  recognition.onend = ()=>micBtn.classList.remove('listening');
+  recognition.onerror = ()=>micBtn.classList.remove('listening');
+};
+
+/* ================= LANGUAGE SELECT ================= */
+const langSelect = document.getElementById('langSelect');
+langSelect.innerHTML = LANGS.map(l=>`<option value="${l.code}">${l.label}</option>`).join('');
+langSelect.value = currentLang;
+langSelect.onchange = ()=>{
+  currentLang = langSelect.value;
+  applyI18n();
+  const log = document.getElementById('chatLog');
+  if(log){ log.innerHTML = ''; addMsg(t('chatWelcome'), 'bot'); }
+};
+
+/* ================= INIT ================= */
+applyI18n();
+addMsg(t('chatWelcome'), 'bot');
+trySessionRestore();
+</script>
+<link rel="stylesheet" href="/assets/enhancements.css">
+<script src="/assets/enhancements.js"></script>
+</body>
+</html>
