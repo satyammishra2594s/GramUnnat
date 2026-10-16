@@ -48,16 +48,6 @@
       background: repeating-linear-gradient(115deg, transparent 0 9%, rgba(255, 104, 38, .035) 10%, transparent 11% 20%);
       animation: haze 8s ease-in-out infinite alternate;
     }
-    .tears {
-      position: fixed; inset: 0; overflow: hidden; z-index: -1;
-      pointer-events: none; user-select: none;
-    }
-    .tear {
-      position: absolute; top: -12vh; left: var(--x); font-size: var(--size);
-      opacity: 0; filter: drop-shadow(0 0 12px rgba(74, 169, 255, .35));
-      animation: cry-fall var(--duration) linear var(--delay) infinite;
-      will-change: transform, opacity;
-    }
     main {
       width: min(100%, 620px); position: relative; text-align: center;
       padding: clamp(30px, 6vw, 54px) clamp(22px, 5vw, 44px);
@@ -66,7 +56,6 @@
       box-shadow: 0 0 0 1px rgba(255, 91, 32, .09), 0 24px 90px rgba(0, 0, 0, .55),
         0 0 70px rgba(255, 69, 24, .17), inset 0 1px rgba(255,255,255,.08);
       backdrop-filter: blur(16px);
-      animation: card-arrive 900ms cubic-bezier(.2,.8,.2,1) both, card-glow 5s ease-in-out 900ms infinite;
     }
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
@@ -77,7 +66,7 @@
     }
     .status-dot {
       width: 7px; height: 7px; border-radius: 50%; background: #ff642a;
-      box-shadow: 0 0 12px #ff642a; animation: blink 1.4s ease-in-out infinite;
+      box-shadow: 0 0 12px #ff642a;
     }
     .mark {
       display: grid; place-items: center; width: 94px; height: 94px; margin: 0 auto 22px;
@@ -85,7 +74,6 @@
       background: linear-gradient(145deg, rgba(255, 110, 35, .24), rgba(18, 72, 130, .5));
       border: 1px solid rgba(255, 166, 95, .4);
       box-shadow: 0 0 40px rgba(255, 75, 24, .22), inset 0 0 25px rgba(56, 145, 255, .12);
-      animation: mark-float 3.2s ease-in-out infinite;
     }
     h1 {
       margin: 0 auto 16px; max-width: 510px; line-height: 1.04;
@@ -93,7 +81,7 @@
       font-weight: 900;
       background: linear-gradient(105deg, #fff4e8 0%, #ff9b5e 31%, #ff4d20 53%, #b7dfff 77%, #fff 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
-      background-size: 220% auto; animation: title-flow 7s ease-in-out infinite;
+      background-size: 220% auto;
     }
     p { margin: 0 auto 12px; max-width: 440px; line-height: 1.75; color: #c3d4ee; }
     .lead { font-size: 1.08rem; color: #edf5ff; }
@@ -115,41 +103,17 @@
     .note span { color: #ff9a68; }
     @keyframes magma-swirl { to { transform: rotate(360deg) scale(1.08); } }
     @keyframes haze { from { opacity: .35; transform: translateY(1%); } to { opacity: .9; transform: translateY(-1%); } }
-    @keyframes cry-fall {
-      0% { transform: translate3d(0, -10vh, 0) rotate(-12deg); opacity: 0; }
-      10% { opacity: var(--opacity, .52); }
-      80% { opacity: var(--opacity, .52); }
-      100% { transform: translate3d(var(--drift), 115vh, 0) rotate(22deg); opacity: 0; }
-    }
-    @keyframes card-arrive { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes card-glow { 0%,100% { box-shadow: 0 0 0 1px rgba(255,91,32,.09), 0 24px 90px rgba(0,0,0,.55), 0 0 55px rgba(255,69,24,.13), inset 0 1px rgba(255,255,255,.08); } 50% { box-shadow: 0 0 0 1px rgba(255,91,32,.16), 0 24px 90px rgba(0,0,0,.55), 0 0 85px rgba(255,69,24,.25), inset 0 1px rgba(255,255,255,.08); } }
-    @keyframes mark-float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
-    @keyframes title-flow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { body::before, body::after, .heat-haze { animation: none !important; } }
   </style>
 </head>
 <body>
   <div class="heat-haze" aria-hidden="true"></div>
-  <div class="tears" aria-hidden="true">
-    <span class="tear" style="--x:4%;--size:24px;--duration:13s;--delay:-8s;--drift:38px;--opacity:.45">😭</span>
-    <span class="tear" style="--x:13%;--size:17px;--duration:17s;--delay:-2s;--drift:-28px;--opacity:.38">💧</span>
-    <span class="tear" style="--x:24%;--size:30px;--duration:15s;--delay:-11s;--drift:55px;--opacity:.55">😢</span>
-    <span class="tear" style="--x:37%;--size:19px;--duration:19s;--delay:-5s;--drift:-40px;--opacity:.4">💧</span>
-    <span class="tear" style="--x:49%;--size:25px;--duration:14s;--delay:-9s;--drift:24px;--opacity:.48">😭</span>
-    <span class="tear" style="--x:61%;--size:16px;--duration:18s;--delay:-1s;--drift:-52px;--opacity:.35">💧</span>
-    <span class="tear" style="--x:73%;--size:29px;--duration:16s;--delay:-13s;--drift:35px;--opacity:.5">😢</span>
-    <span class="tear" style="--x:85%;--size:21px;--duration:14s;--delay:-6s;--drift:-32px;--opacity:.42">💧</span>
-    <span class="tear" style="--x:95%;--size:26px;--duration:20s;--delay:-15s;--drift:44px;--opacity:.46">😭</span>
-  </div>
   <main>
     <div class="eyebrow"><span class="status-dot"></span> New home · Same mission</div>
     <div class="mark" aria-hidden="true">🌾</div>
     <h1>WE HAVE<br>EVOLVED.</h1>
     <p class="lead">GramUnnat has moved to another platform.</p>
-    <p>The old portal is cooling down. The mission is still burning bright. Follow the glow to continue.</p>
+    <p>The mission continues. Visit our website on its new platform.</p>
     <a class="cta" href="https://lambent-heliotrope-564754.netlify.app/" rel="noopener noreferrer">ENTER GRAMUNNAT <span aria-hidden="true">↗</span></a>
     <p class="note"><span>●</span> Destination: GramUnnat · Please use the button above</p>
   </main>
