@@ -61,6 +61,14 @@
       animation:pixel-flicker 6s steps(1,end) infinite;
     }
     @keyframes pixel-flicker { 0%,96%,100% { filter:brightness(1); } 97% { filter:brightness(1.35); } 98% { filter:brightness(.88); } }
+    .mission-copy {
+      max-width:490px; margin:0 auto 12px;
+      font-family:"Press Start 2P","Courier New",monospace;
+      font-size:clamp(.55rem,1.55vw,.72rem); line-height:2.25; letter-spacing:.015em;
+      color:#e5fff8; text-transform:uppercase;
+      text-shadow:2px 2px 0 #d52b24, -2px -1px 0 rgba(36,224,255,.8), 0 0 12px rgba(49,229,255,.28);
+      -webkit-font-smoothing:none; image-rendering:pixelated;
+    }
     .cta {
       display:inline-flex;align-items:center;justify-content:center;gap:12px;margin-top:20px;padding:16px 25px;border-radius:12px;
       color:#fff;text-decoration:none;font-weight:950;letter-spacing:.04em;text-transform:uppercase;
@@ -77,7 +85,7 @@
     @keyframes tree-tears { 0%,100% { transform:translateY(-2px);opacity:.7; } 50% { transform:translateY(5px);opacity:1; } }
     @keyframes title-rattle { 0%,94%,100% { transform:translateX(0) skewX(0); } 95% { transform:translateX(-2px) skewX(-1deg); } 97% { transform:translateX(2px) skewX(1deg); } }
     @keyframes button-pulse { 0%,100% { box-shadow:0 0 0 2px rgba(255,78,18,.18),0 8px 28px rgba(255,59,12,.4),inset 0 1px rgba(255,255,255,.3); } 50% { box-shadow:0 0 0 3px rgba(255,130,28,.22),0 8px 38px rgba(255,59,12,.7),inset 0 1px rgba(255,255,255,.3); } }
-    @media(max-width:480px) { body { padding:14px; } main { padding:28px 19px; } .mark { width:108px;height:108px; } .lead { padding:15px 10px; line-height:1.85; font-size:clamp(.62rem,3vw,.78rem); } }
+    @media(max-width:480px) { body { padding:14px; } main { padding:28px 19px; } .mark { width:108px;height:108px; } .lead { padding:15px 10px; line-height:1.85; font-size:clamp(.62rem,3vw,.78rem); } .mission-copy { font-size:clamp(.5rem,2.4vw,.65rem); line-height:2.1; } }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important;transition:none !important; } }
   </style>
 </head>
@@ -101,7 +109,7 @@
     </div>
     <h1>OLD WORLD.<br>NEW FIRE.</h1>
     <p class="lead">THE OLD GATE IS DEAD. THE NEXT REALM IS BURNING.</p>
-    <p>GramUnnat has evolved beyond this page. Don’t stand in the ashes — blast through to the live platform and keep the mission moving.</p>
+    <p class="mission-copy">GramUnnat has evolved beyond this page. Don’t stand in the ashes — blast through to the live platform and keep the mission moving.</p>
     <a class="cta" href="https://lambent-heliotrope-564754.netlify.app/" rel="noopener noreferrer">IGNITE THE NEXT REALM <span aria-hidden="true">⟶</span></a>
     <p class="note"><span>●</span> PORTAL ACTIVE // YOUR NEXT STOP IS THE LIVE GRAMUNNAT WEBSITE</p>
   </main>
