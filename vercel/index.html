@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07152f">
   <meta name="description" content="GramUnnat has moved. Visit the live GramUnnat website.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <title>GRAMUNNAT // ENTER THE NEXT REALM</title>
   <style>
     :root { color-scheme: dark; --navy:#061127; --lava:#ff3b12; --ember:#ffb12e; --ice:#d9edff; }
@@ -45,7 +48,19 @@
       animation:title-rattle 5s steps(1,end) infinite;
     }
     p { margin:0 auto 12px;max-width:450px;line-height:1.7;color:#c4d8f5; }
-    .lead { font-size:1.12rem;color:#fff4e6;font-weight:750; }
+    .lead {
+      max-width:520px; margin:22px auto 20px; padding:18px 14px;
+      font-family:"Press Start 2P", "Courier New", monospace;
+      font-size:clamp(.72rem,2.5vw,1.04rem); line-height:1.9; letter-spacing:.015em;
+      color:#fff3b0; font-weight:400; text-transform:uppercase;
+      text-shadow:3px 3px 0 #8f2109, 6px 6px 0 #38100b, 0 0 16px rgba(255,117,23,.8);
+      -webkit-font-smoothing:none; image-rendering:pixelated;
+      background:rgba(22,10,7,.48); border:2px solid #ff7928;
+      box-shadow:inset 0 0 0 3px rgba(255,190,65,.12), 5px 5px 0 rgba(80,16,7,.8), 0 0 24px rgba(255,73,14,.18);
+      clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+      animation:pixel-flicker 6s steps(1,end) infinite;
+    }
+    @keyframes pixel-flicker { 0%,96%,100% { filter:brightness(1); } 97% { filter:brightness(1.35); } 98% { filter:brightness(.88); } }
     .cta {
       display:inline-flex;align-items:center;justify-content:center;gap:12px;margin-top:20px;padding:16px 25px;border-radius:12px;
       color:#fff;text-decoration:none;font-weight:950;letter-spacing:.04em;text-transform:uppercase;
@@ -62,7 +77,7 @@
     @keyframes tree-tears { 0%,100% { transform:translateY(-2px);opacity:.7; } 50% { transform:translateY(5px);opacity:1; } }
     @keyframes title-rattle { 0%,94%,100% { transform:translateX(0) skewX(0); } 95% { transform:translateX(-2px) skewX(-1deg); } 97% { transform:translateX(2px) skewX(1deg); } }
     @keyframes button-pulse { 0%,100% { box-shadow:0 0 0 2px rgba(255,78,18,.18),0 8px 28px rgba(255,59,12,.4),inset 0 1px rgba(255,255,255,.3); } 50% { box-shadow:0 0 0 3px rgba(255,130,28,.22),0 8px 38px rgba(255,59,12,.7),inset 0 1px rgba(255,255,255,.3); } }
-    @media(max-width:480px) { body { padding:14px; } main { padding:28px 19px; } .mark { width:108px;height:108px; } }
+    @media(max-width:480px) { body { padding:14px; } main { padding:28px 19px; } .mark { width:108px;height:108px; } .lead { padding:15px 10px; line-height:1.85; font-size:clamp(.62rem,3vw,.78rem); } }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important;transition:none !important; } }
   </style>
 </head>
