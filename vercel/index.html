@@ -3,45 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#203420">
-  <title>GramUnnat — Website Moved</title>
+  <meta name="theme-color" content="#07152f">
+  <meta name="description" content="GramUnnat has moved. Visit the live GramUnnat website.">
+  <title>GramUnnat — The Aftermath</title>
   <style>
-    :root { color-scheme: light; --green: #203420; --gold: #d9a441; }
+    :root {
+      color-scheme: dark;
+      --navy: #07152f;
+      --blue: #123d70;
+      --lava: #ff4d18;
+      --ember: #ff9b35;
+      --ice: #d9edff;
+    }
     * { box-sizing: border-box; }
+    html { min-height: 100%; }
     body {
       margin: 0; min-height: 100vh; display: grid; place-items: center;
-      padding: 24px; background: #f6f1e6; color: #2b2417;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden; isolation: isolate; position: relative; padding: 24px;
+      color: #f6f8ff;
+      background:
+        radial-gradient(ellipse at 16% 15%, rgba(255, 65, 20, .36), transparent 34%),
+        radial-gradient(ellipse at 86% 78%, rgba(15, 95, 170, .48), transparent 38%),
+        radial-gradient(ellipse at 50% 115%, rgba(255, 104, 24, .42), transparent 43%),
+        linear-gradient(135deg, #030817 0%, #07152f 44%, #0b2348 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body::before, body::after {
+      content: ""; position: fixed; z-index: -2; pointer-events: none;
+      width: 72vmax; height: 72vmax; border-radius: 44%;
+      filter: blur(36px); opacity: .68;
+    }
+    body::before {
+      left: -32vmax; top: -36vmax;
+      background: conic-gradient(from 20deg, #ff3d14, #9e1425, #ff8a24, #50162c, #ff3d14);
+      animation: magma-swirl 19s linear infinite;
+    }
+    body::after {
+      right: -38vmax; bottom: -42vmax;
+      background: conic-gradient(from 200deg, #07152f, #174e91, #0b244d, #ff521e, #07152f);
+      animation: magma-swirl 25s linear infinite reverse;
+    }
+    .heat-haze {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background: repeating-linear-gradient(115deg, transparent 0 9%, rgba(255, 104, 38, .035) 10%, transparent 11% 20%);
+      animation: haze 8s ease-in-out infinite alternate;
+    }
+    .tears {
+      position: fixed; inset: 0; overflow: hidden; z-index: -1;
+      pointer-events: none; user-select: none;
+    }
+    .tear {
+      position: absolute; top: -12vh; left: var(--x); font-size: var(--size);
+      opacity: 0; filter: drop-shadow(0 0 12px rgba(74, 169, 255, .35));
+      animation: cry-fall var(--duration) linear var(--delay) infinite;
+      will-change: transform, opacity;
     }
     main {
-      width: min(100%, 560px); text-align: center; background: #fffdf8;
-      border: 1px solid #e3d9c2; border-radius: 22px; padding: 42px 28px;
-      box-shadow: 0 18px 50px rgba(32, 52, 32, .12);
+      width: min(100%, 620px); position: relative; text-align: center;
+      padding: clamp(30px, 6vw, 54px) clamp(22px, 5vw, 44px);
+      border: 1px solid rgba(160, 202, 255, .28); border-radius: 28px;
+      background: linear-gradient(145deg, rgba(8, 21, 45, .89), rgba(13, 31, 62, .78));
+      box-shadow: 0 0 0 1px rgba(255, 91, 32, .09), 0 24px 90px rgba(0, 0, 0, .55),
+        0 0 70px rgba(255, 69, 24, .17), inset 0 1px rgba(255,255,255,.08);
+      backdrop-filter: blur(16px);
+      animation: card-arrive 900ms cubic-bezier(.2,.8,.2,1) both, card-glow 5s ease-in-out 900ms infinite;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 22px;
+      padding: 8px 12px; border: 1px solid rgba(255, 120, 56, .35);
+      border-radius: 999px; background: rgba(255, 79, 24, .09);
+      color: #ffbd8a; text-transform: uppercase; letter-spacing: .19em;
+      font-size: .68rem; font-weight: 800;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #ff642a;
+      box-shadow: 0 0 12px #ff642a; animation: blink 1.4s ease-in-out infinite;
     }
     .mark {
-      display: inline-grid; place-items: center; width: 68px; height: 68px;
-      border-radius: 18px; background: var(--green); color: #fff; font-size: 34px;
-      margin-bottom: 16px;
+      display: grid; place-items: center; width: 94px; height: 94px; margin: 0 auto 22px;
+      border-radius: 28px; font-size: 48px;
+      background: linear-gradient(145deg, rgba(255, 110, 35, .24), rgba(18, 72, 130, .5));
+      border: 1px solid rgba(255, 166, 95, .4);
+      box-shadow: 0 0 40px rgba(255, 75, 24, .22), inset 0 0 25px rgba(56, 145, 255, .12);
+      animation: mark-float 3.2s ease-in-out infinite;
     }
-    h1 { color: var(--green); font-size: clamp(1.7rem, 5vw, 2.3rem); margin: 0 0 12px; }
-    p { line-height: 1.65; color: #5c5240; margin: 0 0 12px; }
-    a {
-      display: inline-block; margin-top: 14px; padding: 13px 22px;
-      border-radius: 10px; background: var(--green); color: #fff;
-      text-decoration: none; font-weight: 700;
+    h1 {
+      margin: 0 auto 16px; max-width: 510px; line-height: 1.04;
+      font-size: clamp(2.1rem, 7.5vw, 4.1rem); letter-spacing: -.055em;
+      font-weight: 900;
+      background: linear-gradient(105deg, #fff4e8 0%, #ff9b5e 31%, #ff4d20 53%, #b7dfff 77%, #fff 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      background-size: 220% auto; animation: title-flow 7s ease-in-out infinite;
     }
-    a:hover, a:focus-visible { background: #304c2d; outline: 3px solid var(--gold); outline-offset: 3px; }
-    .note { font-size: .9rem; margin-top: 18px; }
+    p { margin: 0 auto 12px; max-width: 440px; line-height: 1.75; color: #c3d4ee; }
+    .lead { font-size: 1.08rem; color: #edf5ff; }
+    .cta {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 20px; padding: 15px 24px; border-radius: 13px;
+      color: #fff; text-decoration: none; font-weight: 850; letter-spacing: .01em;
+      background: linear-gradient(110deg, #ff4c1d, #ff7c2d 48%, #174f8e);
+      background-size: 180% auto; border: 1px solid rgba(255, 208, 174, .42);
+      box-shadow: 0 9px 32px rgba(255, 75, 24, .25), inset 0 1px rgba(255,255,255,.2);
+      transition: transform .2s ease, box-shadow .2s ease, background-position .4s ease;
+    }
+    .cta:hover, .cta:focus-visible {
+      transform: translateY(-3px) scale(1.025); background-position: right center;
+      box-shadow: 0 13px 42px rgba(255, 75, 24, .4), 0 0 25px rgba(55, 147, 255, .22);
+      outline: 2px solid #c3e2ff; outline-offset: 4px;
+    }
+    .note { margin-top: 22px; font-size: .8rem; color: #819bc0; }
+    .note span { color: #ff9a68; }
+    @keyframes magma-swirl { to { transform: rotate(360deg) scale(1.08); } }
+    @keyframes haze { from { opacity: .35; transform: translateY(1%); } to { opacity: .9; transform: translateY(-1%); } }
+    @keyframes cry-fall {
+      0% { transform: translate3d(0, -10vh, 0) rotate(-12deg); opacity: 0; }
+      10% { opacity: var(--opacity, .52); }
+      80% { opacity: var(--opacity, .52); }
+      100% { transform: translate3d(var(--drift), 115vh, 0) rotate(22deg); opacity: 0; }
+    }
+    @keyframes card-arrive { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes card-glow { 0%,100% { box-shadow: 0 0 0 1px rgba(255,91,32,.09), 0 24px 90px rgba(0,0,0,.55), 0 0 55px rgba(255,69,24,.13), inset 0 1px rgba(255,255,255,.08); } 50% { box-shadow: 0 0 0 1px rgba(255,91,32,.16), 0 24px 90px rgba(0,0,0,.55), 0 0 85px rgba(255,69,24,.25), inset 0 1px rgba(255,255,255,.08); } }
+    @keyframes mark-float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+    @keyframes title-flow { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
+  <div class="heat-haze" aria-hidden="true"></div>
+  <div class="tears" aria-hidden="true">
+    <span class="tear" style="--x:4%;--size:24px;--duration:13s;--delay:-8s;--drift:38px;--opacity:.45">😭</span>
+    <span class="tear" style="--x:13%;--size:17px;--duration:17s;--delay:-2s;--drift:-28px;--opacity:.38">💧</span>
+    <span class="tear" style="--x:24%;--size:30px;--duration:15s;--delay:-11s;--drift:55px;--opacity:.55">😢</span>
+    <span class="tear" style="--x:37%;--size:19px;--duration:19s;--delay:-5s;--drift:-40px;--opacity:.4">💧</span>
+    <span class="tear" style="--x:49%;--size:25px;--duration:14s;--delay:-9s;--drift:24px;--opacity:.48">😭</span>
+    <span class="tear" style="--x:61%;--size:16px;--duration:18s;--delay:-1s;--drift:-52px;--opacity:.35">💧</span>
+    <span class="tear" style="--x:73%;--size:29px;--duration:16s;--delay:-13s;--drift:35px;--opacity:.5">😢</span>
+    <span class="tear" style="--x:85%;--size:21px;--duration:14s;--delay:-6s;--drift:-32px;--opacity:.42">💧</span>
+    <span class="tear" style="--x:95%;--size:26px;--duration:20s;--delay:-15s;--drift:44px;--opacity:.46">😭</span>
+  </div>
   <main>
+    <div class="eyebrow"><span class="status-dot"></span> New home · Same mission</div>
     <div class="mark" aria-hidden="true">🌾</div>
-    <h1>Website Moved to Another Platform</h1>
-    <p>GramUnnat has moved to another platform.</p>
-    <p>Please click below to continue to our website.</p>
-    <a href="https://lambent-heliotrope-564754.netlify.app/" rel="noopener">Visit GramUnnat</a>
-    <p class="note">If you are not redirected, use the button above.</p>
+    <h1>WE HAVE<br>EVOLVED.</h1>
+    <p class="lead">GramUnnat has moved to another platform.</p>
+    <p>The old portal is cooling down. The mission is still burning bright. Follow the glow to continue.</p>
+    <a class="cta" href="https://lambent-heliotrope-564754.netlify.app/" rel="noopener noreferrer">ENTER GRAMUNNAT <span aria-hidden="true">↗</span></a>
+    <p class="note"><span>●</span> Destination: GramUnnat · Please use the button above</p>
   </main>
 </body>
 </html>
